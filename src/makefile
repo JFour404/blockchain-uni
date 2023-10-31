@@ -14,11 +14,14 @@ endif
 
 CXXFLAGS := -$(OPTIMIZATION_LEVEL)
 
-main: functions.o
-	g++ $(CXXFLAGS) -o program main.cpp functions.o
+main: functions.o hashFunction.o
+	g++ $(CXXFLAGS) -o program main.cpp functions.o hashFunction.o
 
 functions.o: functions.cpp
 	g++ $(CXXFLAGS) -c functions.cpp
+
+hashFunction.o: hashFunction.cpp
+	g++ $(CXXFLAGS) -c hashFunction.cpp
 
 clean:
 	del -f *.o *.exe

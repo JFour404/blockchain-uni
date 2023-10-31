@@ -19,8 +19,6 @@
 #include <unordered_map>
 #include <cstdlib>
 
-#include "participant.h"
-
 using std::string;
 using std::cout;
 using std::cin;
@@ -55,4 +53,15 @@ using std::istream;
 using std::getline;
 using std::bitset;
 
-void setNames (vector<participant>& user);
+void getNames (vector<string>& names);
+
+string hexHashGen(string text);
+vector<int> hashGen(string text);
+vector<int> sequenceGen (unsigned int textSize, int seedSum);
+wint_t seedGen (char symbol);
+vector <int> bitsGen (unsigned int seed);
+void shiftRight (vector<int>& hash, int seq);
+vector <int> hashTornado (vector<int> prevHash, vector<int> newHash);
+string binaryToHex(vector <int> hashBi);
+
+#include "participant.h"

@@ -5,15 +5,15 @@ int main (){
     vector<string> names;
     getNames(names);
 
-    vector<participant> user;
+    vector<wallet> user;
 
     for (int i = 0; i < 10; i++){
 
-        user.push_back(participant(names, i));
+        user.push_back(wallet(names, i));
 
     }
     
-    for (participant d: user) {
+    for (wallet d: user) {
         cout << d.Name() << " " << d.PublicKey() << endl;
     }
     

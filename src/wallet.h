@@ -1,23 +1,30 @@
 #include "header.h"
 #pragma once
 
-
-class participant {
+class wallet {
 
 private:
+    
     std::string m_Name;
     std::string m_PublicKey;
+    std::vector<string> m_UTXOref;
 
 public:
 
-    participant(std::vector<std::string> names, int id){
+    wallet() {
+        m_Name = "";
+        m_PublicKey = "";
+        m_UTXOref.clear();
+    }
+
+    wallet(std::vector<std::string> names, int id){
 
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(1, 1000);
 
-        int randomName = dis(gen);
-        std::string name = names[randomName];
+        int randomNameID = dis(gen) - 1;
+        std::string name = names[randomNameID];
 
         int randomNumber = dis(gen);
         std::ostringstream ss;
@@ -33,4 +40,5 @@ public:
 
     std::string Name() const { return m_Name; }
     std::string PublicKey() const { return m_PublicKey; }
+    std::vector<string> UTXO() const { return m_UTXOref; }
 };

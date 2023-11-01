@@ -5,7 +5,7 @@ class transaction {
 
 private:
 
-    string m_ID;
+    string m_ID; //prideti utxo
     vector<string> m_UTXO;
     string m_Timestamp;
 
@@ -66,6 +66,25 @@ public:
             }
         
         }
+
+        string transactionsInfo;
+
+        for (transfer t: m_Transfer) {
+
+            transactionsInfo += t.from.PublicKey();
+
+            for (int i = 0; i < t.to.size(); i++) {
+
+                transactionsInfo += t.to[i].PublicKey();
+                transactionsInfo += t.amount[i];
+
+            }
+
+        }
+
+        string hashText = m_Timestamp + transactionsInfo;
+
+        m_ID = hexHashGen(hashText);
     
     }
 

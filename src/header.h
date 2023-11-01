@@ -66,3 +66,4 @@ string binaryToHex(vector <int> hashBi);
 
 #include "wallet.h"
 #include "transaction.h"
+#include "block.h"

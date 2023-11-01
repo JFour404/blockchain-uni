@@ -21,3 +21,4 @@ void getNames (vector<string>& names){
     buferis.clear();
 
 }
+

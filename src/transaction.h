@@ -158,4 +158,6 @@ public:
         
     }
 
+    string Id () const { return m_ID; }
+
 };

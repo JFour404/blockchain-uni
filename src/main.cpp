@@ -8,20 +8,26 @@ int main (){
     vector<wallet> user;
     vector<transaction> payment;
 
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < 100; i++){
 
         user.push_back(wallet(names, i));
 
     }
     
-    for (wallet d: user) {
-        cout << d.Name() << " " << d.PublicKey() << endl;
+
+    for (int i = 0; i < 500; i++){
+
+        payment.push_back(transaction(user));
+
     }
+
+    vector<block> testNet;
 
     for (int i = 0; i < 10; i++){
 
-        payment.push_back(transaction(user));
-        payment[i].Info();
+        block newBlock (testNet, payment, 0);
+        testNet.push_back(newBlock);
+        newBlock.Info(i);
 
     }
     

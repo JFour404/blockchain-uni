@@ -7,6 +7,7 @@ private:
 
     string m_ID;
     vector<string> m_UTXO;
+    string m_Timestamp;
 
     struct transfer{
         wallet from;
@@ -26,6 +27,10 @@ private:
 public:
 
     transaction (vector<wallet>& user) {
+        
+        auto now = std::chrono::system_clock::now();
+        time_t timestamp = std::chrono::system_clock::to_time_t(now);
+        m_Timestamp = std::ctime(&timestamp);
         
         random_device rd;
         mt19937 gen(rd());
@@ -65,6 +70,70 @@ public:
     }
 
     void Info () {
+        
+        cout << "-----Transaction-----" << endl;
+        cout << "ID: " << m_ID << endl;
+        cout << m_Timestamp << endl;
+        
+        vector<wallet> fromList;
+        for (transfer d: m_Transfer) {
+            
+            wallet newSender = d.from;
+            auto findSender = find(fromList.begin(), fromList.end(), newSender);
+            
+            if (findSender == fromList.end()) {
+
+                fromList.push_back(newSender);
+
+            }
+
+        }
+
+        cout << "From: " << endl;
+        for (wallet d: fromList) {
+
+            cout << d.PublicKey() << " $ " << "SOON" << endl;
+
+        }
+        cout << endl;
+//-----------------------------------------------
+
+        vector<wallet> toList;
+        vector<double> amountList;
+        for (transfer d: m_Transfer) {
+            
+            for (int i = 0; i < d.to.size(); i++) {
+
+                wallet newReciever = d.to[i];
+                auto findReciever = find(toList.begin(), toList.end(), newReciever);
+
+                if (findReciever == toList.end()) {
+
+                    toList.push_back(newReciever);
+                    amountList.push_back(d.amount[i]);
+
+                } else {
+
+                    int index = std::distance(toList.begin(), findReciever);
+                    amountList[index] += d.amount[i];
+
+                }
+
+            }
+
+        }
+
+        cout << "To: " << endl;
+        for (int i = 0; i < toList.size(); i++) {
+
+            cout << toList[i].PublicKey() << " $ " << amountList[i] << endl;
+
+        }
+        cout << endl;
+
+        
+
+
 
 
         

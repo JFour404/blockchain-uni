@@ -36,9 +36,18 @@ public:
         std::string index = std::to_string(id);
         std::string text = m_Name + index;
         m_PublicKey = hexHashGen(text);
+
+        m_UTXOref.clear();
+
     }
 
     std::string Name() const { return m_Name; }
     std::string PublicKey() const { return m_PublicKey; }
     std::vector<string> UTXO() const { return m_UTXOref; }
+
+    bool operator==(const wallet& other) const {
+        
+        return this->m_PublicKey == other.m_PublicKey;
+    
+    }
 };

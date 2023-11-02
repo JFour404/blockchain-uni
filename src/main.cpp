@@ -5,29 +5,32 @@ int main (){
     vector<string> names;
     getNames(names);
 
-    vector<wallet> user;
-    vector<transaction> payment;
+    vector<wallet> userPool;
+    vector<transaction> paymentPool;
 
-    for (int i = 0; i < 100; i++){
+    for (int i = 0; i < 1000; i++){
 
-        user.push_back(wallet(names, i));
+        userPool.push_back(wallet(names, i));
 
     }
     
+    for (int i = 0; i < 10000; i++){
 
-    for (int i = 0; i < 500; i++){
-
-        payment.push_back(transaction(user));
+        paymentPool.push_back(transaction(userPool));
 
     }
 
     vector<block> testNet;
 
-    for (int i = 0; i < 10; i++){
+    block genesis(userPool);
+    testNet.push_back(genesis);
+    genesis.Info(0);
 
-        block newBlock (testNet, payment, 0);
+    for (int i = 0; i < 999; i++){
+
+        block newBlock (testNet, paymentPool, 4);
         testNet.push_back(newBlock);
-        newBlock.Info(i);
+        newBlock.Info(i+1);
 
     }
     

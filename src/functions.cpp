@@ -22,3 +22,10 @@ void getNames (vector<string>& names){
 
 }
 
+string getTimestamp() {
+
+    auto now = std::chrono::system_clock::now();
+    time_t timestamp = std::chrono::system_clock::to_time_t(now);
+    return std::ctime(&timestamp);
+
+}

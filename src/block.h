@@ -6,7 +6,7 @@ class block {
 private:
 
     string m_Hash;              // +
-    string m_PrevHash = "soon";          // +
+    string m_PrevHash;          // +
     string m_Timestamp;         // +
     string m_Version = "v0.1";  // +
     string m_MerkelRootHash;    // + TODO: full implementation
@@ -16,46 +16,44 @@ private:
 
 public:
 
-    block (vector<block> blockchain, vector<transaction> txPool, int difficultyTarget) {
+    block(vector<block> blockchain, vector<transaction> txPool, int difficultyTarget) {
 
         m_DifficultyTarget = difficultyTarget;
 
-        //m_PrevHash = blockchain.back().Hash();
+        m_PrevHash = blockchain.back().Hash();
 
-        
-        int lower = 0, upper = txPool.size();
-        vector<int> chosenTX(upper - lower + 1);
-        std::iota(chosenTX.begin(), chosenTX.end(), lower);
 
         random_device rd;
-        mt19937 gen(rd()); 
+        mt19937 gen(rd());
 
-        std::shuffle(chosenTX.begin(), chosenTX.end(), gen);
-
-        chosenTX.resize(100);
-
-        for (int txIndex: chosenTX) {
-
-            m_TX.push_back(txPool[txIndex]);
-
-        }
+        std::sample(txPool.begin(), txPool.end(), std::back_inserter(m_TX), 100, gen);
 
 
-        string tempMerkel = "";
+        m_MerkelRootHash = hexHashGen(MerkelRoot());
 
-        for (transaction selected: m_TX) {
-
-            tempMerkel += selected.Id();
-
-        }
-
-        m_MerkelRootHash = hexHashGen(tempMerkel);
+        m_Timestamp = getTimestamp();
 
         m_Hash = blockHashGen();
 
-        auto now = std::chrono::system_clock::now();
-        time_t timestamp = std::chrono::system_clock::to_time_t(now);
-        m_Timestamp = std::ctime(&timestamp);
+    }
+
+    block(vector<wallet> user) {
+
+        m_DifficultyTarget = 0;
+        m_PrevHash = "";
+
+        for (wallet w: user) {
+
+            transaction newAnnex(w);
+            m_TX.push_back(newAnnex);
+
+        }
+
+        m_MerkelRootHash = hexHashGen(MerkelRoot());
+
+        m_Timestamp = getTimestamp();
+
+        m_Hash = blockHashGen();
 
     }
 
@@ -76,14 +74,25 @@ public:
         out_r << left << setw(20) << "Version: " << m_Version << endl;
         out_r << left << setw(20) << "Merkle Root: " << m_MerkelRootHash << endl;
         out_r << left << setw(20) << "Nonce: " << m_Nonce << endl;
-        out_r << left << setw(20) << "Difficulty target: " << m_DifficultyTarget << endl;
+        out_r << left << setw(20) << "Difficulty target: " << m_DifficultyTarget << endl << endl << endl;
         out_r << left << setw(20) << "Transactions: " << m_TX.size() << endl;
+        out_r << "------------------------------------------------------------------------------------" << endl;
+        
+        for (int i = 0; i < m_TX.size(); i++) {
+            
+            out_r << i << " ID: " << m_TX[i].Id() << endl;
+            out_r << m_TX[i].TimestampInfo() << endl;
+
+            m_TX[i].FileInfo(out_r);
+        }
+
+        out_r.close();
 
     }
 
 
 private:
-
+    
     string blockHashGen() {
 
         string hashText = "";
@@ -113,6 +122,20 @@ private:
         }
 
         if (zerosNum >= m_DifficultyTarget) { return true; } else { return false; }
+
+    }
+
+    string MerkelRoot () {
+
+        string tempMerkel = "";
+
+        for (transaction selected: m_TX) {
+
+            tempMerkel += selected.Id();
+
+        }
+
+        return tempMerkel;
 
     }
 

@@ -54,6 +54,8 @@ using std::getline;
 using std::bitset;
 
 void getNames (vector<string>& names);
+string askCommand (int select);
+string getTimestamp();
 
 string hexHashGen(string text);
 vector<int> hashGen(string text);
@@ -65,3 +67,6 @@ vector <int> hashTornado (vector<int> prevHash, vector<int> newHash);
 string binaryToHex(vector <int> hashBi);
 
 #include "wallet.h"
+#include "transaction.h"
+#include "block.h"
+#include "blockchainApp.h"

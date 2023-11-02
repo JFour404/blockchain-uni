@@ -25,3 +25,6 @@ hashFunction.o: hashFunction.cpp
 
 clean:
 	del -f *.o *.exe
+
+cleanBlocks:
+	del /S /Q ..\blocks\*

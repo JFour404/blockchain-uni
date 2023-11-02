@@ -3,13 +3,9 @@
 
 class transaction {
 
-private:
+public:
 
-    string m_ID;
-    vector<string> m_UTXO;
-    string m_Timestamp;
-
-    struct transfer{
+struct transfer{
         wallet from;
         vector<wallet> to;
         vector<double> amount;
@@ -20,6 +16,14 @@ private:
             amount.clear();
         }
     };
+
+private:
+
+    string m_ID;
+    vector<string> m_UTXO;
+    string m_Timestamp;
+
+    
 
     vector<transfer> m_Transfer;
     transfer m_NewTransfer;

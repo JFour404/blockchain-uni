@@ -54,6 +54,7 @@ using std::getline;
 using std::bitset;
 
 void getNames (vector<string>& names);
+string askCommand (int select);
 string getTimestamp();
 
 string hexHashGen(string text);

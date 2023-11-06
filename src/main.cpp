@@ -7,9 +7,12 @@ int main (){
     bool enableInspection = "false";
 
     blockchainApp app;
-    int blockchainSize = 15;
-    int difficultyTarget = 3;
+    int blockchainSize = 10;
+    int difficultyTarget = 2;
 
+    app.UtxoTestCase();
+
+   /* 
     cout << "Pasirinkite programos funkcija: " << endl;
     cout << "/0 Paleisti bloku grandine." << endl;
     cout << "/1 Atspausdinti informacija (cmd)." << endl;
@@ -78,6 +81,6 @@ int main (){
         }
 
     }
-
+*/
     return 0;
 }

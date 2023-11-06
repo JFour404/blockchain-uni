@@ -8,7 +8,7 @@ private:
     string m_Hash;              // +
     string m_PrevHash;          // +
     string m_Timestamp;         // +
-    string m_Version = "v0.1";  // +
+    string m_Version = "v0.2";  // +
     string m_MerkelRootHash;    // + TODO: full implementation
     int m_Nonce = 0;            // +
     int m_DifficultyTarget;     // +
@@ -26,7 +26,7 @@ public:
         random_device rd;
         mt19937 gen(rd());
 
-        std::sample(txPool.begin(), txPool.end(), std::back_inserter(m_TX), 100, gen);
+        std::sample(txPool.begin(), txPool.end(), std::back_inserter(m_TX), 100, gen); // TODO: validation check
 
 
         m_MerkelRootHash = hexHashGen(MerkelRoot());

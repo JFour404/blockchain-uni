@@ -45,14 +45,10 @@ public:
     std::string PublicKey() const { return m_PublicKey; }
     std::vector<string> UTXO() const { return m_UTXOref; }
 
-    void UtxoAdd (vector<string> addedUtxo) {
+    void UtxoAdd (string addedUtxo) {
 
-        for (string utxo: addedUtxo) {
+        m_UTXOref.push_back(addedUtxo);
 
-            m_UTXOref.push_back(utxo);
-
-        }
-        
     }
 
     void UtxoDelete (vector<string> deletedUtxo) {

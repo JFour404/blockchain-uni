@@ -1,14 +1,54 @@
+#pragma once
 #include "header.h"
+
 
 class blockchainApp {
 
 public:
     
+    void UtxoTestCase() {
+
+        InitializeUsers();
+        InitializeTransactions();
+        CreateGenesisBlock();
+        UpdateWallets();
+        CreateBlocks(5, 2);
+        PrintWalletsInfo();
+
+//-----------------------------------------
+
+        // InitializeUsers();
+        // CreateGenesisBlock();
+
+        // cout << m_LiveNet.back().Hash();
+
+        // for (transaction tx: m_LiveNet.back().Tx()) {
+
+        //     cout << tx.Id() << endl;
+            
+        //     for (transaction::transfer t: tx.Transfer()) {
+
+        //         cout << "wallets:" << endl;
+        //         for (wallet w: t.to) {
+
+        //              cout << w.PublicKey() << endl;
+
+        //         }
+        //         cout << "----------" << endl;
+               
+
+        //     }
+
+        // }
+
+
+    }
+
     void InitializeUsers() {
         
         getNames(m_Names);
         
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             
             m_UserPool.push_back(wallet(m_Names, i));
         
@@ -41,7 +81,63 @@ public:
             block newBlock (m_LiveNet, m_PaymentPool, difficultyTarget);
             m_LiveNet.push_back(newBlock);
             newBlock.Info(i+1);
+
+            UpdateWallets();
         
+        }
+
+    }
+
+    void UpdateWallets() {
+
+        block latestBlock = m_LiveNet.back();
+
+        for (transaction tx: latestBlock.Tx()) {
+
+            string newUtxo = tx.Id();
+            vector<wallet> addedTo;
+
+            for (transaction::transfer t: tx.Transfer()) {
+
+                for (wallet w: t.to) {
+
+                    addedTo.push_back(w);
+
+                }
+
+            }
+
+            for (wallet& w: m_UserPool) {
+
+                if (std::find(addedTo.begin(), addedTo.end(), w) != addedTo.end()){
+
+                    w.UtxoAdd(newUtxo);
+
+                }
+
+            }
+
+
+
+        }
+    
+
+    }
+
+    void PrintWalletsInfo() {
+
+        for (wallet w: m_UserPool) {
+
+            cout << w.Name() << endl;
+            cout << w.PublicKey() << endl;
+            cout << "UTXO's:" << endl;
+            for (string txId: w.UTXO()) { 
+                
+                cout << txId << endl; 
+                
+            }
+            cout << "-----" << endl;
+
         }
 
     }

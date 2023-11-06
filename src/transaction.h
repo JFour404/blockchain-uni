@@ -1,11 +1,13 @@
 #include "header.h"
 #pragma once
 
+
+
 class transaction {
 
 public:
 
-struct transfer{
+    struct transfer{
         wallet from;
         vector<wallet> to;
         vector<double> amount;
@@ -30,6 +32,7 @@ private:
 
 public:
 
+    //creates starting Tx pool
     transaction(vector<wallet>& user) {
         
         Timestamp();
@@ -73,6 +76,7 @@ public:
     
     }
 
+    //minted coins for 1 user, not validated
     transaction(wallet user) {    
         
         Timestamp();
@@ -265,5 +269,7 @@ public:
 
     string Id() const { return m_ID; }
     string TimestampInfo() const { return m_Timestamp; }
+    vector<transfer> Transfer() const { return m_Transfer; }
+    vector<string> Utxo() const { return m_UTXO; }
 
 };

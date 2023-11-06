@@ -117,10 +117,64 @@ public:
 
             }
 
-
+            
 
         }
     
+    }
+
+    void ValidateTransaction(wallet sender, double coinsNeeded, double& foundCoins, vector<string>& usedUtxo) {
+
+        bool stopLoops = false;
+        foundCoins = 0;
+        
+        vector<string> utxo;
+        utxo = sender.UTXO();
+
+        for (block b: m_LiveNet) {
+            if (stopLoops) break;
+
+            for (transaction tx: b.Tx()) {
+                if (stopLoops) break;
+
+                auto it = std::find(utxo.begin(), utxo.end(), tx.Id());
+                if (it != utxo.end()) {
+
+                    for (transaction::transfer t: tx.Transfer()) {
+                        if (stopLoops) break;
+
+                        for (int i = 0; i < t.to.size(); i++) {
+
+                            if (t.to[i] == sender) {
+
+                                foundCoins += t.amount[i];
+                                usedUtxo.push_back(tx.Id());
+
+                                if (foundCoins > coinsNeeded) {
+                                    stopLoops = true;
+                                    break;
+                                } 
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        if (coinsNeeded > foundCoins) {
+
+            usedUtxo[0] = "insuficient";
+
+        }
+
+
+
 
     }
 

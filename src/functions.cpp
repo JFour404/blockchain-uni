@@ -73,3 +73,10 @@ string getTimestamp() {
     return std::ctime(&timestamp);
 
 }
+
+void updateWallets (vector<block> blockchain, vector<wallet>& userPool) {
+
+    
+
+}
+

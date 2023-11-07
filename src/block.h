@@ -37,12 +37,12 @@ public:
 
     }
 
-    block(vector<wallet> user) {
+    block(vector<wallet>& user) {
 
         m_DifficultyTarget = 0;
         m_PrevHash = "";
 
-        for (wallet w: user) {
+        for (wallet& w: user) {
 
             transaction newAnnex(w);
             m_TX.push_back(newAnnex);
@@ -80,6 +80,7 @@ public:
         
         for (int i = 0; i < m_TX.size(); i++) {
             
+            out_r << endl;
             out_r << i << " ID: " << m_TX[i].Id() << endl;
             out_r << m_TX[i].TimestampInfo() << endl;
 

@@ -27,7 +27,7 @@ public:
         uniform_int_distribution<> coinsQuantity(10, 100000);
         
         int randomWalletID1 = userID(gen) - 1;
-        m_Reciever = userPool[randomWalletID1];
+        m_Sender = userPool[randomWalletID1];
 
         int randomWalletID2;
         do { randomWalletID2 = userID(gen) - 1; } while (randomWalletID1 == randomWalletID2);
@@ -41,7 +41,8 @@ public:
     
     }
 
-    transaction(wallet user) {    
+    //only for genesis block
+    transaction(wallet& user) {    
         
         Timestamp();
 
@@ -54,6 +55,10 @@ public:
         m_Amount = mintedCoins;
         
         m_ID = hexHashGen(TransactionServiceInfo());
+
+        vector<string> utxoToAdd;
+        utxoToAdd.push_back(m_ID);
+        user.UtxoAdd(utxoToAdd);
 
     }
 
@@ -93,15 +98,12 @@ public:
         
         cout << "-----Transaction-----" << endl;
         cout << "ID: " << m_ID << endl;
-        cout << m_Timestamp << endl << endl;
-        
+        cout << m_Timestamp << endl;
         cout << "From: " << endl;
         cout << m_Sender.PublicKey() << " $ " << "Balance" << endl;
-        cout << " |" << endl;
-        cout << " V" << endl;
         cout << "To: " << endl;
         cout << m_Reciever.PublicKey() << " $ " << m_Amount << endl;
-        cout << endl;
+        cout << "-----------------------------------------------------------------------------" << endl;
 
     }
     
@@ -109,10 +111,8 @@ public:
         
         out_r << "From: " << endl;
         out_r << m_Sender.PublicKey() << " $ " << "Balance" << endl;
-        cout << " |" << endl;
-        cout << " V" << endl;
         out_r << "To: " << endl;
-        out_r << m_Sender.PublicKey() << " $ " << m_Amount << endl;
+        out_r << m_Reciever.PublicKey() << " $ " << m_Amount << endl;
         out_r << endl;
         out_r << "------------------------------------------------------------------------------------" << endl;
     

@@ -56,7 +56,7 @@ public:
         m_UTXOref.erase(remove_if(m_UTXOref.begin(), m_UTXOref.end(), [&](const string& m_UTXOref) {
         return find(deletedUtxo.begin(), deletedUtxo.end(), m_UTXOref) != deletedUtxo.end();
         }), m_UTXOref.end());
-
+        
     }
     
     bool operator==(const wallet& other) const {

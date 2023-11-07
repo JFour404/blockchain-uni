@@ -25,8 +25,6 @@ private:
     vector<string> m_UTXO;
     string m_Timestamp;
 
-    
-
     vector<transfer> m_Transfer;
     transfer m_NewTransfer;
 
@@ -271,5 +269,15 @@ public:
     string TimestampInfo() const { return m_Timestamp; }
     vector<transfer> Transfer() const { return m_Transfer; }
     vector<string> Utxo() const { return m_UTXO; }
+
+    void Utxo(vector<string> usedUtxo) {
+
+        for (string s: usedUtxo) {
+
+            m_UTXO.push_back(s);
+
+        }
+
+    }
 
 };

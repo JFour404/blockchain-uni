@@ -9,11 +9,15 @@ public:
     void UtxoTestCase() {
 
         InitializeUsers();
-        InitializeTransactions();
         CreateGenesisBlock();
         UpdateWallets();
+        InitializeTransactions();
+
+        cout << "Balance of 1st wallet: " << FindBalance(m_UserPool[0]) << endl;
         CreateBlocks(5, 2);
-        PrintWalletsInfo();
+        
+
+        //PrintWalletsInfo();
 
 //-----------------------------------------
 
@@ -83,8 +87,12 @@ public:
             newBlock.Info(i+1);
 
             UpdateWallets();
+
+            cout << "Balance of 1st wallet: " << FindBalance(m_UserPool[0]) << endl;
         
         }
+
+        
 
     }
 
@@ -97,6 +105,7 @@ public:
             string newUtxo = tx.Id();
             vector<wallet> addedTo;
 
+            //adding utxo to wallets
             for (transaction::transfer t: tx.Transfer()) {
 
                 for (wallet w: t.to) {
@@ -117,14 +126,53 @@ public:
 
             }
 
-            
+            //deleting used utxo from wallets
+            vector<wallet> sendFrom;
+            vector<vector<string>> utxoToDelete;
+            for (transaction::transfer t: tx.Transfer()) {
+                
+                wallet sender;
+                
+                auto it = std::find(m_UserPool.begin(), m_UserPool.end(), t.from);
+
+                if (it != m_UserPool.end()) { sender = *it; } 
+
+                double spendCoins = 0;
+                for (double coins: t.amount) {
+
+                    spendCoins += coins;
+
+                }
+
+                double foundCoins = 0;
+                vector<string> usedUtxo;
+
+                UsableUtxoFinder(sender, spendCoins, foundCoins, usedUtxo);
+        
+                sendFrom.push_back(sender);
+                utxoToDelete.push_back(usedUtxo);
+
+            }
+
+            for (wallet& w: m_UserPool) {
+
+                auto it = std::find(sendFrom.begin(), sendFrom.end(), w);
+                if (it != sendFrom.end()){
+                    
+                    auto index = std::distance(sendFrom.begin(), it);
+                    w.UtxoDelete(utxoToDelete[index]);
+
+                }
+
+            }
 
         }
     
     }
 
-    void ValidateTransaction(wallet sender, double coinsNeeded, double& foundCoins, vector<string>& usedUtxo) {
+    void UsableUtxoFinder(wallet sender, double coinsNeeded, double& foundCoins, vector<string>& usedUtxo) {
 
+        bool valid = false;
         bool stopLoops = false;
         foundCoins = 0;
         
@@ -167,14 +215,74 @@ public:
 
         }
 
-        if (coinsNeeded > foundCoins) {
+        
 
-            usedUtxo[0] = "insuficient";
+
+
+    }
+
+    struct reciept {
+
+            string utxoID;
+            double amount;
+
+    };
+
+    vector<reciept> FindReciept(wallet user) {
+
+        vector<reciept> spreadsheet;
+        
+        
+        for (block b: m_LiveNet) {
+
+            for (transaction tx: b.Tx()) {
+
+                for (auto it = spreadsheet.begin(); it != spreadsheet.end(); ) {
+                    
+                    if (it->utxoID == tx.Id()) { it = spreadsheet.erase(it);} 
+                    else { ++it; }
+
+                }
+                
+                for (transaction::transfer t: tx.Transfer()) {
+
+                    for (int i = 0; i < t.to.size(); i++) {
+
+                        if (t.to[i] == user) {  
+
+                            reciept temp;
+                            temp.utxoID = tx.Id();
+                            temp.amount = t.amount[i];
+
+                            spreadsheet.push_back(temp);
+
+                        }
+
+                    }
+
+                }
+
+            }
 
         }
 
+        return spreadsheet;
 
+    }
 
+    double FindBalance (wallet user) {
+
+        vector<reciept> temp = FindReciept(user);
+
+        double total = 0;
+
+        for (reciept r: temp) {
+
+            total += r.amount;
+
+        }
+
+        return total;
 
     }
 

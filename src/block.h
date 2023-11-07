@@ -1,6 +1,7 @@
 #include "header.h"
 #pragma once
 
+
 class block {
 
 private:
@@ -14,6 +15,8 @@ private:
     int m_DifficultyTarget;     // +
     vector<transaction> m_TX;   // + TODO: validation
 
+    int m_TxQuantity = 5;
+
 public:
 
     block(vector<block> blockchain, vector<transaction> txPool, int difficultyTarget) {
@@ -23,11 +26,12 @@ public:
         m_PrevHash = blockchain.back().Hash();
 
 
-        random_device rd;
-        mt19937 gen(rd());
+//         random_device rd;
+//         mt19937 gen(rd());
 
-        std::sample(txPool.begin(), txPool.end(), std::back_inserter(m_TX), 100, gen); // TODO: validation check
+// std::sample(txPool.begin(), txPool.end(), std::back_inserter(m_TX), m_TxQuantity, gen); // TODO: validation check
 
+        m_TX = validTx(blockchain, txPool);
 
         m_MerkelRootHash = hexHashGen(MerkelRoot());
 
@@ -122,6 +126,116 @@ private:
         }
 
         if (zerosNum >= m_DifficultyTarget) { return true; } else { return false; }
+
+    }
+
+    vector<transaction> validTx(vector<block> blockchain, vector<transaction> txPool) {
+
+        vector<transaction> chosenTx;
+
+        //vector<vector<blockchainApp::reciept>> fundsCheck;
+
+        vector<int> shuffledTx = genRandomNumbers (txPool.size() - 1);
+
+        int i = 0;
+        while (chosenTx.size() < m_TxQuantity && i < txPool.size()) {
+        
+            transaction tx = txPool[shuffledTx[i]];
+            
+            for (transaction::transfer t: tx.Transfer()) {
+
+                wallet sender = t.from;
+
+                double requiredFunds = 0;
+                for (double d: t.amount) { requiredFunds += d; }
+
+                double availableFunds = 0;
+                vector<string> usedUtxo;
+                
+                UsableUtxoFinder(sender, requiredFunds, availableFunds, usedUtxo, blockchain);
+                
+                // cout << "Required funds: " << requiredFunds << endl;
+                // cout << "Available funds: " << availableFunds << endl;
+
+                if (requiredFunds > availableFunds) { break; }
+
+                tx.Utxo(usedUtxo);
+                chosenTx.push_back(tx);
+
+            }
+
+            i++;
+
+        }        
+
+        return chosenTx;
+
+    }
+
+    void UsableUtxoFinder(wallet sender, double coinsNeeded, double& foundCoins, vector<string>& usedUtxo, vector<block> blockchain) {
+
+    bool valid = false;
+    bool stopLoops = false;
+    foundCoins = 0;
+    
+    vector<string> utxo;
+    utxo = sender.UTXO();
+
+//for (string s: utxo ) { cout << s << endl; }
+
+    for (block b: blockchain) {
+        if (stopLoops) break;
+
+        for (transaction tx: b.Tx()) {
+            if (stopLoops) break;
+
+            auto it = std::find(utxo.begin(), utxo.end(), tx.Id());
+            if (it != utxo.end()) {
+
+                for (transaction::transfer t: tx.Transfer()) {
+                    if (stopLoops) break;
+
+                    for (int i = 0; i < t.to.size(); i++) {
+
+                        if (t.to[i] == sender) {
+
+                            foundCoins += t.amount[i];
+                            usedUtxo.push_back(tx.Id());
+
+                            if (foundCoins > coinsNeeded) {
+                                stopLoops = true;
+                                break;
+                            } 
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+//cout << "Available funds: " << foundCoins << endl;
+
+}
+
+    vector<int> genRandomNumbers (int upper) {
+
+        random_device rd;
+        mt19937 gen(rd());
+
+        int lower = 0;
+
+        vector<int> numbers(upper - lower + 1);
+        std::iota(numbers.begin(), numbers.end(), lower);
+
+        std::shuffle(numbers.begin(), numbers.end(), gen);
+
+        return numbers;
 
     }
 

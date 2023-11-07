@@ -73,3 +73,111 @@ string getTimestamp() {
     return std::ctime(&timestamp);
 
 }
+
+
+
+vector<blockchainApp::reciept> findReciept(wallet user, vector<block> m_LiveNet) {
+
+    vector<blockchainApp::reciept> spreadsheet;
+    
+    
+    for (block b: m_LiveNet) {
+
+        for (transaction tx: b.Tx()) {
+
+            for (auto it = spreadsheet.begin(); it != spreadsheet.end(); ) {
+                
+                if (it->utxoID == tx.Id()) { it = spreadsheet.erase(it);} 
+                else { ++it; }
+
+            }
+            
+            for (transaction::transfer t: tx.Transfer()) {
+
+                for (int i = 0; i < t.to.size(); i++) {
+
+                    if (t.to[i] == user) {  
+
+                        blockchainApp::reciept temp;
+                        temp.utxoID = tx.Id();
+                        temp.amount = t.amount[i];
+
+                        spreadsheet.push_back(temp);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return spreadsheet;
+
+}
+
+double findBalance (wallet user, vector<block> m_LiveNet) {
+
+
+    vector<blockchainApp::reciept> temp = findReciept(user, m_LiveNet);
+
+    double total = 0;
+
+    for (blockchainApp::reciept r: temp) {
+
+        total += r.amount;
+
+    }
+
+    return total;
+
+}
+
+void usableUtxoFinder(wallet sender, double coinsNeeded, double& foundCoins, vector<string>& usedUtxo, vector<block> m_LiveNet) {
+
+    bool valid = false;
+    bool stopLoops = false;
+    foundCoins = 0;
+    
+    vector<string> utxo;
+    utxo = sender.UTXO();
+
+    for (block b: m_LiveNet) {
+        if (stopLoops) break;
+
+        for (transaction tx: b.Tx()) {
+            if (stopLoops) break;
+
+            auto it = std::find(utxo.begin(), utxo.end(), tx.Id());
+            if (it != utxo.end()) {
+
+                for (transaction::transfer t: tx.Transfer()) {
+                    if (stopLoops) break;
+
+                    for (int i = 0; i < t.to.size(); i++) {
+
+                        if (t.to[i] == sender) {
+
+                            foundCoins += t.amount[i];
+                            usedUtxo.push_back(tx.Id());
+
+                            if (foundCoins > coinsNeeded) {
+                                stopLoops = true;
+                                break;
+                            } 
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+}

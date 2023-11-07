@@ -66,7 +66,17 @@ void shiftRight (vector<int>& hash, int seq);
 vector <int> hashTornado (vector<int> prevHash, vector<int> newHash);
 string binaryToHex(vector <int> hashBi);
 
+
+
+
 #include "wallet.h"
 #include "transaction.h"
 #include "block.h"
 #include "blockchainApp.h"
+
+
+
+vector<blockchainApp::reciept> findReciept(wallet user, vector<block> m_LiveNet);
+double findBalance (wallet user, vector<block> m_LiveNet);
+
+//void usableUtxoFinder(wallet sender, double coinsNeeded, double& foundCoins, vector<string>& usedUtxo, vector<block> m_LiveNet);

@@ -7,7 +7,7 @@ int main (){
     bool enableInspection = "false";
 
     blockchainApp app;
-    int blockchainSize = 15;
+    int blockchainSize = 5;
     int difficultyTarget = 3;
 
     cout << "Pasirinkite programos funkcija: " << endl;

@@ -3,7 +3,7 @@
 
 class infoNet {
 
-    public:
+public:
 
     void UpadateWallets(vector<block> blockchain, vector<wallet>& userPool) {
 
@@ -89,7 +89,6 @@ class infoNet {
         }
 
     }
-
     
     double FindUsersBalance(vector<block> blockchain, wallet user) {
     
@@ -117,4 +116,7 @@ class infoNet {
 
     return balance;
 }
+
+
+
 };

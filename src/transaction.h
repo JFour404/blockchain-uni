@@ -120,5 +120,6 @@ public:
     double Amount() const { return m_Amount; }
     string SenderPkey() const { return m_Sender.PublicKey(); }
     string RecieverPkey() const { return m_Reciever.PublicKey(); }
+    wallet Sender() const { return m_Sender; }
 
 };

@@ -22,10 +22,17 @@ public:
 
     void InitializeTransactions() {
         
-        for (int i = 0; i < m_TxNum; i++) {
+        while (m_PaymentPool.size() < m_TxNum) {
             
-            m_PaymentPool.push_back(transaction(m_UserPool));
-        
+            transaction newTx(m_UserPool);
+            wallet sender = newTx.Sender();
+
+            if (info.FindUsersBalance(m_LiveNet, sender) >= newTx.Amount()) {
+
+                m_PaymentPool.push_back(newTx);
+
+            }
+            
         }
 
     }

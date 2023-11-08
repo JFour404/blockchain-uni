@@ -35,16 +35,19 @@ int main (){
             cout << "Generuojamos pinigines..." << endl;
             app.InitializeUsers();
 
-            cout << "Generuojamos transakcijos..." << endl;
-            app.InitializeTransactions();
-
             cout << "Generuojamas genesis blokas..." << endl;
             app.CreateGenesisBlock();
+
+            cout << "Generuojamos transakcijos..." << endl;
+            app.InitializeTransactions();
 
             cout << "Generuojami blokai..." << endl;
             app.CreateBlocks(blockchainSize, difficultyTarget);
             cout << "Bloku generavimas baigtas!" << endl;
             cout << "Visus blokus ir ju trasakcijas galite rasti <blocks> aplankale." << endl;
+
+            
+
 
             enableInspection = true;
 

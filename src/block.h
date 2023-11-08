@@ -24,12 +24,7 @@ public:
 
         m_PrevHash = blockchain.back().Hash();
 
-
-        random_device rd;
-        mt19937 gen(rd());
-
-        std::sample(txPool.begin(), txPool.end(), std::back_inserter(m_TX), m_TxNum, gen);
-
+        m_TX = validTx(blockchain, txPool);
 
         m_MerkelRootHash = MerkelRoot();
 
@@ -166,6 +161,110 @@ private:
 
         return treeLeaves[0];
 
+    }
+
+    vector<transaction> validTx(vector<block> blockchain, vector<transaction> txPool) {
+
+        vector<transaction> chosenTx;
+
+        vector<int> shuffledTx = genRandomNumbers (txPool.size() - 1);
+
+        vector<wallet> sender;
+        vector<double> balance; 
+        int n = 0;
+        
+        while (chosenTx.size() < m_TxNum && n < txPool.size()) {
+        
+            transaction tx = txPool[shuffledTx[n]];
+            
+            wallet tempSender = tx.Sender();
+            double tempBalance = FindUsersBalance(blockchain, tempSender);
+            bool newSender = true;
+
+            int index;
+            for (int i = 0; i < sender.size(); i++) {
+
+                if (sender[i].PublicKey() == tx.SenderPkey()) {
+                    
+                    index = i;
+
+                    tempSender = sender[i];
+                    tempBalance = balance[i];
+
+                    newSender = false;
+                    break;
+                }
+
+            }
+            
+            if (tempBalance >= tx.Amount()) {
+
+                chosenTx.push_back(tx);
+                
+                if (newSender) {
+                    
+                    tempBalance -= tx.Amount();
+                    sender.push_back(tempSender);
+                    balance.push_back(tempBalance);
+
+                } else {
+                
+                    balance[index] -= tx.Amount(); 
+                
+                }
+
+            }
+
+            n++;
+
+        }        
+
+        return chosenTx;
+
+    }
+
+    
+    vector<int> genRandomNumbers (int upper) {
+
+        random_device rd;
+        mt19937 gen(rd());
+
+        int lower = 0;
+
+        vector<int> numbers(upper - lower + 1);
+        std::iota(numbers.begin(), numbers.end(), lower);
+
+        std::shuffle(numbers.begin(), numbers.end(), gen);
+
+        return numbers;
+
+    }
+
+    double FindUsersBalance(vector<block> blockchain, wallet user) {
+    
+        double balance = 0;
+
+        for (block b: blockchain) {
+            
+            for (transaction tx: b.Tx()) {
+                
+                if (tx.SenderPkey() == user.PublicKey()) {
+                    
+                    balance -= tx.Amount();
+
+                }
+                
+                if (tx.RecieverPkey() == user.PublicKey()) {
+                    
+                    balance += tx.Amount();
+
+                }
+            
+            }
+        
+        }
+
+        return balance;
     }
 
 };

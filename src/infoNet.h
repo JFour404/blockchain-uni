@@ -92,30 +92,30 @@ public:
     
     double FindUsersBalance(vector<block> blockchain, wallet user) {
     
-    double balance = 0;
+        double balance = 0;
 
-    for (block b: blockchain) {
-        
-        for (transaction tx: b.Tx()) {
+        for (block b: blockchain) {
             
-            if (tx.SenderPkey() == user.PublicKey()) {
+            for (transaction tx: b.Tx()) {
                 
-                balance -= tx.Amount();
+                if (tx.SenderPkey() == user.PublicKey()) {
+                    
+                    balance -= tx.Amount();
 
-            }
+                }
+                
+                if (tx.RecieverPkey() == user.PublicKey()) {
+                    
+                    balance += tx.Amount();
+
+                }
             
-            if (tx.RecieverPkey() == user.PublicKey()) {
-                
-                balance += tx.Amount();
-
             }
         
         }
-    
-    }
 
-    return balance;
-}
+        return balance;
+    }
 
 
 

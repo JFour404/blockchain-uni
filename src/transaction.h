@@ -13,6 +13,13 @@ private:
     wallet m_Reciever;
     double m_Amount;
 
+    void Timestamp() {
+
+        auto now = std::chrono::system_clock::now();
+        time_t timestamp = std::chrono::system_clock::to_time_t(now);
+        m_Timestamp = std::ctime(&timestamp);
+
+    }
     
 public:
 
@@ -41,7 +48,7 @@ public:
     
     }
 
-    //only for genesis block
+    //for genesis block
     transaction(wallet user) {    
         
         Timestamp();
@@ -58,15 +65,6 @@ public:
 
     }
 
-private:
-
-    void Timestamp() {
-
-        auto now = std::chrono::system_clock::now();
-        time_t timestamp = std::chrono::system_clock::to_time_t(now);
-        m_Timestamp = std::ctime(&timestamp);
-
-    }
 
     string TransactionServiceInfo() {
 
@@ -86,9 +84,6 @@ private:
         return (m_Timestamp + transactionsInfo);
 
     }
-
-
-public:
 
     void CmdInfo() {
         

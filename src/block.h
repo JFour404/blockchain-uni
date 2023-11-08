@@ -13,11 +13,14 @@ private:
     int m_Nonce = 0;            // +
     int m_DifficultyTarget;     // +
     vector<transaction> m_TX;   // + TODO: validation
+    int m_Miner = 0;
 
-    int m_TxNum = 10;   //100 atrenkama 1 blokui
+    int m_TxNum = 100;   //100 atrenkama 1 blokui
 
 public:
 
+    block() {};
+    
     block(vector<block> blockchain, vector<transaction> txPool, int difficultyTarget) {
 
         m_DifficultyTarget = difficultyTarget;
@@ -56,6 +59,7 @@ public:
 
     string Hash() const { return m_Hash; }
     vector<transaction> Tx() const { return m_TX; }
+    void Miner(int miner) { m_Miner = miner; } 
 
     void Info(int index) {
 
@@ -65,6 +69,7 @@ public:
 
         out_r << left << setw(20) << "Block " << index << endl << endl;
         out_r << left << setw(20) << "Details" << endl;
+        out_r << left << setw(20) << "Miner: " << m_Miner << endl;
         out_r << left << setw(20) << "Hash: " << m_Hash << endl;
         out_r << left << setw(20) << "Previous hash: " << m_PrevHash << endl;
         out_r << left << setw(20) << "Mined: " << m_Timestamp << endl;

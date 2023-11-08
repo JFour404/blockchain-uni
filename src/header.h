@@ -18,6 +18,7 @@
 #include <codecvt>
 #include <unordered_map>
 #include <cstdlib>
+#include <omp.h>
 
 using std::string;
 using std::cout;

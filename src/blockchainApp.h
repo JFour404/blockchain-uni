@@ -1,10 +1,12 @@
 #include "header.h"
 #pragma once
 
+
+
 class blockchainApp {
 
-    int m_TxNum = 1000;     //10000 naudojama txPool
-    int m_UsersNum = 10;    //1000
+    int m_TxNum = 10000;     //10000 naudojama txPool
+    int m_UsersNum = 1000;    //1000
 
 public:
     
@@ -50,28 +52,85 @@ public:
         
         for (int i = 0; i < blockChainSize; i++) {
             
-            block newBlock (m_LiveNet, m_PaymentPool, difficultyTarget);
-            m_LiveNet.push_back(newBlock);
-            newBlock.Info(i+1);
-        
-            info.UpadateWallets(m_LiveNet, m_UserPool);
+            m_LiveNet.push_back(blockMining(difficultyTarget));
+            m_LiveNet.back().Info( i+1 );
 
-
-            // cout << "Pirmosios pinigines info: " << endl;
-            // cout << "Name: " << m_UserPool[0].Name() << endl;
-            // cout << "Balance: " << info.FindUsersBalance(m_LiveNet, m_UserPool[0]) << endl;
-            // cout << "UTXOs: " << endl;
-            // for (string s: m_UserPool[0].UTXO()) {
-
-            //     cout << s << endl;
-
-            // }
-            // cout << "-----------" << endl;
-            
         }
 
-        
+    }
 
+
+    block blockMining(int difficultyTarget) {
+        
+        block minedBlock;
+        bool blockMined = false;
+        int numThreads = 5;
+
+        #pragma omp parallel num_threads(numThreads)
+        {
+            block localBlock;
+
+            while (!blockMined) {
+                localBlock = block(m_LiveNet, m_PaymentPool, difficultyTarget);
+                localBlock.Miner(omp_get_thread_num());
+
+                #pragma omp critical
+                {
+                    if (!blockMined) {
+                        minedBlock = localBlock;
+                        blockMined = true;
+                    }
+                }
+            }
+        }
+
+        return minedBlock;
+    }
+    
+    
+
+
+
+
+
+
+
+
+
+    void Mining(int difficultyTarget) {
+
+        #include <omp.h>
+
+        int numMiners = 5;
+        omp_set_num_threads(numMiners);
+        bool blockMined = false;
+        block newBlock(m_LiveNet, m_PaymentPool, difficultyTarget);
+
+        #pragma omp parallel shared(blockMined, newBlock)
+        {
+            #pragma omp for
+            for(int i = 0; i < omp_get_num_threads(); i++)
+            {
+                if(!blockMined)
+                {
+                    #pragma omp critical
+                    {
+                        if(!blockMined)
+                        {
+                            newBlock.Miner(i);
+                            
+                            #pragma omp atomic write
+                            blockMined = true;
+                            
+                            m_LiveNet.push_back(newBlock);
+                            newBlock.Info(i+1);
+
+                            info.UpadateWallets(m_LiveNet, m_UserPool);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     vector<string> m_Names;

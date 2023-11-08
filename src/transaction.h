@@ -42,7 +42,7 @@ public:
     }
 
     //only for genesis block
-    transaction(wallet& user) {    
+    transaction(wallet user) {    
         
         Timestamp();
 
@@ -55,10 +55,6 @@ public:
         m_Amount = mintedCoins;
         
         m_ID = hexHashGen(TransactionServiceInfo());
-
-        vector<string> utxoToAdd;
-        utxoToAdd.push_back(m_ID);
-        user.UtxoAdd(utxoToAdd);
 
     }
 
@@ -107,7 +103,7 @@ public:
 
     }
     
-    void FileInfo(ofstream& out_r) const {
+    void FileInfo(ofstream& out_r) {
         
         out_r << "From: " << endl;
         out_r << m_Sender.PublicKey() << " $ " << "Balance" << endl;
@@ -120,5 +116,9 @@ public:
 
     string Id() const { return m_ID; }
     string TimestampInfo() const { return m_Timestamp; }
+    vector<string> Utxo() const { return m_UTXO; }
+    double Amount() const { return m_Amount; }
+    string SenderPkey() const { return m_Sender.PublicKey(); }
+    string RecieverPkey() const { return m_Reciever.PublicKey(); }
 
 };

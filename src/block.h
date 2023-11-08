@@ -14,6 +14,8 @@ private:
     int m_DifficultyTarget;     // +
     vector<transaction> m_TX;   // + TODO: validation
 
+    int m_TxNum = 10;   //100 atrenkama 1 blokui
+
 public:
 
     block(vector<block> blockchain, vector<transaction> txPool, int difficultyTarget) {
@@ -26,10 +28,10 @@ public:
         random_device rd;
         mt19937 gen(rd());
 
-        std::sample(txPool.begin(), txPool.end(), std::back_inserter(m_TX), 100, gen);
+        std::sample(txPool.begin(), txPool.end(), std::back_inserter(m_TX), m_TxNum, gen);
 
 
-        m_MerkelRootHash = hexHashGen(MerkelRoot());
+        m_MerkelRootHash = MerkelRoot();
 
         m_Timestamp = getTimestamp();
 
@@ -37,19 +39,19 @@ public:
 
     }
 
-    block(vector<wallet>& user) {
+    block(vector<wallet> user) {
 
         m_DifficultyTarget = 0;
         m_PrevHash = "";
 
-        for (wallet& w: user) {
+        for (wallet w: user) {
 
             transaction newAnnex(w);
             m_TX.push_back(newAnnex);
 
         }
 
-        m_MerkelRootHash = hexHashGen(MerkelRoot());
+        m_MerkelRootHash = MerkelRoot();
 
         m_Timestamp = getTimestamp();
 
@@ -90,7 +92,14 @@ public:
         out_r.close();
 
     }
+    
+    //Prideda ir istrina paskutiniame bloke panaudotus utxo
+    void UpdateWallets(vector<wallet>& usersPool) { 
 
+        //pridedame utxo
+
+
+    }
 
 private:
     
@@ -128,15 +137,34 @@ private:
 
     string MerkelRoot () {
 
-        string tempMerkel = "";
+        vector<string> treeLeaves;
 
-        for (transaction selected: m_TX) {
+        for (int i = 0; i < m_TX.size(); i++) {
 
-            tempMerkel += selected.Id();
+            treeLeaves.push_back(m_TX[i].Id());
 
         }
 
-        return tempMerkel;
+        while (treeLeaves.size() > 1) {
+            
+            if (treeLeaves.size() % 2 != 0) {
+                
+                treeLeaves.push_back(treeLeaves.back());
+
+            }
+
+            vector<string> newHashes;
+            for (int i = 0; i < treeLeaves.size(); i += 2) {
+
+                newHashes.push_back(hexHashGen(treeLeaves[i] + treeLeaves[i + 1]));
+
+            }
+
+            treeLeaves = newHashes;
+
+        }
+
+        return treeLeaves[0];
 
     }
 

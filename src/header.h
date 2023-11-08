@@ -18,6 +18,7 @@
 #include <codecvt>
 #include <unordered_map>
 #include <cstdlib>
+#include <omp.h>
 
 using std::string;
 using std::cout;
@@ -69,4 +70,5 @@ string binaryToHex(vector <int> hashBi);
 #include "wallet.h"
 #include "transaction.h"
 #include "block.h"
+#include "infoNet.h"
 #include "blockchainApp.h"

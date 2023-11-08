@@ -4,15 +4,17 @@
 int main (){
     
     string mainFunction = "";
-    bool enableInspection = "false";
+    bool enableInspection = false;
 
     blockchainApp app;
-    int blockchainSize = 15;
+    infoNet info;
+    int blockchainSize = 5;
     int difficultyTarget = 3;
 
     cout << "Pasirinkite programos funkcija: " << endl;
     cout << "/0 Paleisti bloku grandine." << endl;
     cout << "/1 Atspausdinti informacija (cmd)." << endl;
+    cout << "/2 Sandbox" << endl;
     cout << "/e exit" << endl;
 
     while ((mainFunction = askCommand(0)) != "/e"){
@@ -33,18 +35,21 @@ int main (){
             cout << "Generuojamos pinigines..." << endl;
             app.InitializeUsers();
 
-            cout << "Generuojamos transakcijos..." << endl;
-            app.InitializeTransactions();
-
             cout << "Generuojamas genesis blokas..." << endl;
             app.CreateGenesisBlock();
+
+            cout << "Generuojamos transakcijos..." << endl;
+            app.InitializeTransactions();
 
             cout << "Generuojami blokai..." << endl;
             app.CreateBlocks(blockchainSize, difficultyTarget);
             cout << "Bloku generavimas baigtas!" << endl;
             cout << "Visus blokus ir ju trasakcijas galite rasti <blocks> aplankale." << endl;
 
-            enableInspection = "true";
+            
+
+
+            enableInspection = true;
 
         } 
         
@@ -74,6 +79,58 @@ int main (){
                 app.m_LiveNet[chosenBlock].Tx()[chosenTransaction].CmdInfo();
 
             }
+
+        }
+
+        else if (mainFunction == "/2") {
+
+            cout << "Generuojamos pinigines..." << endl;
+            app.InitializeUsers();
+
+            cout << "Generuojamos transakcijos..." << endl;
+            app.InitializeTransactions();
+
+            cout << "Generuojamas genesis blokas..." << endl;
+            app.CreateGenesisBlock();
+
+            cout << "Atnaujinama piniginiu info..." << endl;
+            info.UpadateWallets(app.m_LiveNet, app.m_UserPool);
+
+            double mintedSuply = 0;
+            for (wallet w: app.m_UserPool) {
+                mintedSuply += info.FindUsersBalance(app.m_LiveNet, w);
+            }
+
+            
+            // cout << "Pirmosios pinigines info: " << endl;
+            // cout << "Name: " << app.m_UserPool[0].Name() << endl;
+            // cout << "Balance: " << info.FindUsersBalance(app.m_LiveNet, app.m_UserPool[0]) << endl;
+            // cout << "UTXOs: " << endl;
+            // for (string s: app.m_UserPool[0].UTXO()) {
+
+            //     cout << s << endl;
+
+            // }
+            // cout << "-----------" << endl;
+
+
+
+            cout << "Sukurta monetu: " << mintedSuply << endl;
+
+            cout << "Generuojami blokai..." << endl;
+            app.CreateBlocks(blockchainSize, difficultyTarget);
+            cout << "Bloku generavimas baigtas!" << endl;
+
+            double circulatingSuply = 0;
+            for (wallet w: app.m_UserPool) {
+                circulatingSuply += info.FindUsersBalance(app.m_LiveNet, w);
+            }
+
+            cout << "Apyvartoje esancios monetos: " << circulatingSuply << endl;
+
+
+
+
 
         }
 

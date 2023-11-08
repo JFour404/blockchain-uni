@@ -15,7 +15,7 @@ endif
 CXXFLAGS := -$(OPTIMIZATION_LEVEL)
 
 main: functions.o hashFunction.o
-	g++ $(CXXFLAGS) -o program main.cpp functions.o hashFunction.o
+	g++ $(CXXFLAGS) -fopenmp -o program main.cpp functions.o hashFunction.o
 
 functions.o: functions.cpp
 	g++ $(CXXFLAGS) -c functions.cpp

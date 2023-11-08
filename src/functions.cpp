@@ -27,7 +27,7 @@ string askCommand (int select) {
     string input;
     if (select==0){
         while(1){
-        if (!(cin >> input)||(input!="/0"&&input!="/1"&&input!="/e")){
+        if (!(cin >> input)||(input!="/0"&&input!="/1"&&input!="/2"&&input!="/e")){
             cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
             cin.clear(); 
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
@@ -73,3 +73,10 @@ string getTimestamp() {
     return std::ctime(&timestamp);
 
 }
+
+void updateWallets (vector<block> blockchain, vector<wallet>& userPool) {
+
+    
+
+}
+

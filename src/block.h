@@ -5,15 +5,17 @@ class block {
 
 private:
 
-    string m_Hash;              // +
+    int m_BlockIndex;
+    string m_Hash = "";         // +
     string m_PrevHash;          // +
     string m_Timestamp;         // +
-    string m_Version = "v0.1";  // +
+    string m_Version = "v0.3";  // +
     string m_MerkelRootHash;    // + TODO: full implementation
     int m_Nonce = 0;            // +
     int m_DifficultyTarget;     // +
     vector<transaction> m_TX;   // + TODO: validation
     int m_Miner = 0;
+    string hashText;
 
     int m_TxNum = 100;   //100 atrenkama 1 blokui
 
@@ -22,6 +24,8 @@ public:
     block() {};
     
     block(vector<block> blockchain, vector<transaction> txPool, int difficultyTarget) {
+
+        m_BlockIndex = blockchain.size();
 
         m_DifficultyTarget = difficultyTarget;
 
@@ -37,9 +41,30 @@ public:
 
     }
 
+    block(vector<block> blockchain, vector<transaction> txPool, int difficultyTarget, bool blockMined) {
+
+        m_BlockIndex = blockchain.size();
+
+        m_DifficultyTarget = difficultyTarget;
+
+        m_PrevHash = blockchain.back().Hash();
+
+        m_TX = validTx(blockchain, txPool);
+
+        m_MerkelRootHash = MerkelRoot();
+
+        m_Timestamp = getTimestamp();
+        
+        hashText = m_PrevHash + m_Timestamp + m_Version + m_MerkelRootHash + to_string(m_DifficultyTarget);
+
+    }
+
     block(vector<wallet> user) {
 
+        m_BlockIndex = 0;
+
         m_DifficultyTarget = 0;
+
         m_PrevHash = "";
 
         for (wallet w: user) {
@@ -59,37 +84,39 @@ public:
 
     string Hash() const { return m_Hash; }
     vector<transaction> Tx() const { return m_TX; }
+    int Index() const { return m_BlockIndex; }
     void Miner(int miner) { m_Miner = miner; } 
 
-    void Info(int index) {
-
-        string fileRez = "block" + to_string(index) + ".txt";
-
-        ofstream out_r("../blocks/" + fileRez);
-
-        out_r << left << setw(20) << "Block " << index << endl << endl;
-        out_r << left << setw(20) << "Details" << endl;
-        out_r << left << setw(20) << "Miner: " << m_Miner << endl;
-        out_r << left << setw(20) << "Hash: " << m_Hash << endl;
-        out_r << left << setw(20) << "Previous hash: " << m_PrevHash << endl;
-        out_r << left << setw(20) << "Mined: " << m_Timestamp << endl;
-        out_r << left << setw(20) << "Version: " << m_Version << endl;
-        out_r << left << setw(20) << "Merkle Root: " << m_MerkelRootHash << endl;
-        out_r << left << setw(20) << "Nonce: " << m_Nonce << endl;
-        out_r << left << setw(20) << "Difficulty target: " << m_DifficultyTarget << endl << endl << endl;
-        out_r << left << setw(20) << "Transactions: " << m_TX.size() << endl;
-        out_r << "------------------------------------------------------------------------------------" << endl;
+    void BlockHashGenParallel() {
         
-        for (int i = 0; i < m_TX.size(); i++) {
-            
-            out_r << endl;
-            out_r << i << " ID: " << m_TX[i].Id() << endl;
-            out_r << m_TX[i].TimestampInfo() << endl;
+        string tempText;
+        string tempHash;
 
-            m_TX[i].FileInfo(out_r);
-        }
+        m_Nonce++;
+        
+        tempText = hashText + to_string(m_Nonce);
+        tempHash = hexHashGen(tempText);
 
-        out_r.close();
+        if (checkHashDifficulty(tempHash) == true) {
+
+            m_Hash = tempHash;
+            hashText.clear();
+
+        } 
+
+    }
+
+    void Info() {
+
+        string fileRez = "block" + to_string(m_BlockIndex) + ".txt";
+
+        Print (fileRez);
+
+    }
+
+    void Info(string fileRez) {
+
+       Print(fileRez);
 
     }
     
@@ -121,6 +148,8 @@ private:
         return tempHash;
     }
 
+public:
+
     bool checkHashDifficulty(string hash) {
         
         size_t zerosNum = hash.find_first_not_of('0');
@@ -134,6 +163,8 @@ private:
         if (zerosNum >= m_DifficultyTarget) { return true; } else { return false; }
 
     }
+
+private:
 
     string MerkelRoot () {
 
@@ -270,6 +301,36 @@ private:
         }
 
         return balance;
+    }
+
+    void Print(string fileRez) {
+
+        ofstream out_r("../blocks/" + fileRez);
+
+        out_r << left << setw(20) << "Block " << m_BlockIndex << endl << endl;
+        out_r << left << setw(20) << "Details" << endl;
+        out_r << left << setw(20) << "Miner: " << m_Miner << endl;
+        out_r << left << setw(20) << "Hash: " << m_Hash << endl;
+        out_r << left << setw(20) << "Previous hash: " << m_PrevHash << endl;
+        out_r << left << setw(20) << "Mined: " << m_Timestamp << endl;
+        out_r << left << setw(20) << "Version: " << m_Version << endl;
+        out_r << left << setw(20) << "Merkle Root: " << m_MerkelRootHash << endl;
+        out_r << left << setw(20) << "Nonce: " << m_Nonce << endl;
+        out_r << left << setw(20) << "Difficulty target: " << m_DifficultyTarget << endl << endl << endl;
+        out_r << left << setw(20) << "Transactions: " << m_TX.size() << endl;
+        out_r << "------------------------------------------------------------------------------------" << endl;
+        
+        for (int i = 0; i < m_TX.size(); i++) {
+            
+            out_r << endl;
+            out_r << i << " ID: " << m_TX[i].Id() << endl;
+            out_r << m_TX[i].TimestampInfo() << endl;
+
+            m_TX[i].FileInfo(out_r);
+        }
+
+        out_r.close();
+
     }
 
 };

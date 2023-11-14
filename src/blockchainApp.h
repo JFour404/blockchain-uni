@@ -44,16 +44,16 @@ public:
 
         block genesis(m_UserPool);
         m_LiveNet.push_back(genesis);
-        genesis.Info(0);
+        genesis.Info();
 
     }
 
     void CreateBlocks(int blockChainSize, int difficultyTarget) {
-        
+
         for (int i = 0; i < blockChainSize; i++) {
             
             m_LiveNet.push_back(blockMining(difficultyTarget));
-            m_LiveNet.back().Info( i+1 );
+            m_LiveNet.back().Info();
 
         }
 
@@ -69,16 +69,20 @@ public:
         #pragma omp parallel num_threads(numThreads)
         {
             block localBlock;
+            localBlock = block(m_LiveNet, m_PaymentPool, difficultyTarget, blockMined);
 
             while (!blockMined) {
-                localBlock = block(m_LiveNet, m_PaymentPool, difficultyTarget);
-                localBlock.Miner(omp_get_thread_num());
-
+                
+                localBlock.BlockHashGenParallel();
+                
                 #pragma omp critical
                 {
-                    if (!blockMined) {
-                        minedBlock = localBlock;
+                    if (!blockMined && localBlock.checkHashDifficulty(localBlock.Hash())) {
+                        
                         blockMined = true;
+                        localBlock.Miner(omp_get_thread_num());
+                        minedBlock = localBlock;
+                        
                     }
                 }
             }
@@ -98,8 +102,6 @@ public:
 
 
     void Mining(int difficultyTarget) {
-
-        #include <omp.h>
 
         int numMiners = 5;
         omp_set_num_threads(numMiners);
@@ -123,7 +125,7 @@ public:
                             blockMined = true;
                             
                             m_LiveNet.push_back(newBlock);
-                            newBlock.Info(i+1);
+                            newBlock.Info();
 
                             info.UpadateWallets(m_LiveNet, m_UserPool);
                         }

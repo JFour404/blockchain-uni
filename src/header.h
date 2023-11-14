@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <cstdlib>
 #include <omp.h>
+#include <set>
+#include <omp.h>
 
 using std::string;
 using std::cout;
@@ -53,9 +55,11 @@ using std::remove_if;
 using std::istream;
 using std::getline;
 using std::bitset;
+using std::set;
 
 void getNames (vector<string>& names);
 string askCommand (int select);
+int intInput ();
 string getTimestamp();
 
 string hexHashGen(string text);

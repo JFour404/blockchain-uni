@@ -31,10 +31,12 @@ string askCommand (int select) {
         while(1){
             if (!getline(cin, input)) {
                 cout << "Neteisinga ivestis. Prasome ivesti is naujo" << endl << endl;
+                cout << ">";
                 cin.clear(); 
                 cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
             } else if (commands.find(input) == commands.end()) {
                 cout << "Neteisinga ivestis. Prasome ivesti is naujo" << endl << endl;
+                cout << ">";
             } else {
                 break;
             }

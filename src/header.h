@@ -72,6 +72,7 @@ vector <int> hashTornado (vector<int> prevHash, vector<int> newHash);
 string binaryToHex(vector <int> hashBi);
 
 #include "wallet.h"
+#include "utxo.h"
 #include "transaction.h"
 #include "block.h"
 #include "infoNet.h"

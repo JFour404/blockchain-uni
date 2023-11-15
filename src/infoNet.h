@@ -22,7 +22,9 @@ public:
 
                     if (sendersBalance > tx.Amount()){
                         
-                        w.UtxoAdd(tx.Id());
+                        wallet::utxo temp;
+                        temp.txId = tx.Id();
+                        w.UtxoAdd(temp);
 
                     }    
 
@@ -38,13 +40,15 @@ public:
 
                             for (int i = 0; i < w.UTXO().size(); i++) {
 
-                                if (tX.Id() == w.UTXO()[i]) {
+                                if (tX.Id() == w.UTXO()[i].txId) {
 
                                     if (w.PublicKey() == tX.RecieverPkey()) { 
                                         
                                         foundFunds += tX.Amount();
-                                        w.UtxoDelete(tX.Id()); 
-
+                                        wallet::utxo temp;
+                                        temp.txId = tx.Id();
+                                        w.UtxoDelete(temp);
+                                        
                                         break;
                                     }
 
@@ -80,7 +84,9 @@ public:
 
                 if (w.PublicKey() == recieversPkey) {
 
-                    w.UtxoAdd(tx.Id());
+                    wallet::utxo temp;
+                    temp.txId = tx.Id();
+                    w.UtxoAdd(temp);
 
                 }
             

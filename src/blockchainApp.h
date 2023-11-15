@@ -13,7 +13,10 @@ public:
     void InitializeUsers() {
         
         getNames(m_Names);
-        
+
+        m_UserPool.clear();
+        m_UserPool.shrink_to_fit();
+
         for (int i = 0; i < m_UsersNum; i++) {
             
             m_UserPool.push_back(wallet(m_Names, i));
@@ -40,6 +43,13 @@ public:
 
     }
 
+    void InitializeTransactionsUtxo() {
+
+        transactionUtxo newTx(m_UserPool);
+        newTx.CmdInfo();
+
+    }
+
     void CreateGenesisBlock() {
 
         block genesis(m_UserPool);
@@ -58,7 +68,6 @@ public:
         }
 
     }
-
 
     block blockMining(int difficultyTarget) {
         

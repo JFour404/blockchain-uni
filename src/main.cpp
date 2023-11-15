@@ -176,19 +176,28 @@ int main (){
             cout << "Generuojamos pinigines..." << endl;
             app.InitializeUsers();
 
-            cout << "Generuojamas genesis blokas..." << endl;
-            app.CreateGenesisBlock();
-            
             cout << "Generuojamos transakcijos..." << endl;
-            app.InitializeTransactions();
+            app.InitializeTransactionsUtxo();
 
-            cout << "Atnaujinama piniginiu info..." << endl;
-            info.UpadateWallets(app.m_LiveNet, app.m_UserPool);
+            
 
-            double mintedSuply = 0;
-            for (wallet w: app.m_UserPool) {
-                mintedSuply += info.FindUsersBalance(app.m_LiveNet, w);
-            }
+
+
+
+
+            // cout << "Generuojamas genesis blokas..." << endl;
+            // app.CreateGenesisBlock();
+            
+            // cout << "Generuojamos transakcijos..." << endl;
+            // app.InitializeTransactions();
+
+            // cout << "Atnaujinama piniginiu info..." << endl;
+            // info.UpadateWallets(app.m_LiveNet, app.m_UserPool);
+
+            // double mintedSuply = 0;
+            // for (wallet w: app.m_UserPool) {
+            //     mintedSuply += info.FindUsersBalance(app.m_LiveNet, w);
+            // }
 
             
             // cout << "Pirmosios pinigines info: " << endl;
@@ -204,18 +213,18 @@ int main (){
 
 
 
-            cout << "Sukurta monetu: " << mintedSuply << endl;
+            // cout << "Sukurta monetu: " << mintedSuply << endl;
 
-            cout << "Generuojami blokai..." << endl;
-            app.CreateBlocks(blockchainSize, difficultyTarget);
-            cout << "Bloku generavimas baigtas!" << endl;
+            // cout << "Generuojami blokai..." << endl;
+            // app.CreateBlocks(blockchainSize, difficultyTarget);
+            // cout << "Bloku generavimas baigtas!" << endl;
 
-            double circulatingSuply = 0;
-            for (wallet w: app.m_UserPool) {
-                circulatingSuply += info.FindUsersBalance(app.m_LiveNet, w);
-            }
+            // double circulatingSuply = 0;
+            // for (wallet w: app.m_UserPool) {
+            //     circulatingSuply += info.FindUsersBalance(app.m_LiveNet, w);
+            // }
 
-            cout << "Apyvartoje esancios monetos: " << circulatingSuply << endl;
+            // cout << "Apyvartoje esancios monetos: " << circulatingSuply << endl;
 
 
 

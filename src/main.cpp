@@ -176,17 +176,14 @@ int main (){
             cout << "Generuojamos pinigines..." << endl;
             app.InitializeUsers();
 
-            cout << "Generuojamos transakcijos..." << endl;
-            app.InitializeTransactionsUtxo();
+            cout << "Generuojamas genesis blokas..." << endl;
+            app.CreateGenesisBlock();
+            
+            // cout << "Generuojamos transakcijos..." << endl;
+            // app.InitializeTransactionsUtxo();
 
             
 
-
-
-
-
-            // cout << "Generuojamas genesis blokas..." << endl;
-            // app.CreateGenesisBlock();
             
             // cout << "Generuojamos transakcijos..." << endl;
             // app.InitializeTransactions();

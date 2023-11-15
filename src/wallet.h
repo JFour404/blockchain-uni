@@ -9,6 +9,7 @@ public:
     {
         string txId;
         int outputNum;
+        double value = 0;
 
         bool operator==(const utxo& other) const {
             

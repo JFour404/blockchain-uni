@@ -99,50 +99,6 @@ public:
 
         return minedBlock;
     }
-    
-    
-
-
-
-
-
-
-
-
-
-    void Mining(int difficultyTarget) {
-
-        int numMiners = 5;
-        omp_set_num_threads(numMiners);
-        bool blockMined = false;
-        block newBlock(m_LiveNet, m_PaymentPool, difficultyTarget);
-
-        #pragma omp parallel shared(blockMined, newBlock)
-        {
-            #pragma omp for
-            for(int i = 0; i < omp_get_num_threads(); i++)
-            {
-                if(!blockMined)
-                {
-                    #pragma omp critical
-                    {
-                        if(!blockMined)
-                        {
-                            newBlock.Miner(i);
-                            
-                            #pragma omp atomic write
-                            blockMined = true;
-                            
-                            m_LiveNet.push_back(newBlock);
-                            newBlock.Info();
-
-                            info.UpadateWallets(m_LiveNet, m_UserPool);
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     vector<string> m_Names;
     vector<wallet> m_UserPool;

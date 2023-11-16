@@ -62,13 +62,6 @@ public:
         int randomWalletID2;
         do { randomWalletID2 = userID(gen) - 1; } while (randomWalletID1 == randomWalletID2);
         
-        input tempInput;
-        tempInput.sender = userPool[randomWalletID1];
-        wallet::utxo tempUtxo;
-        tempUtxo.txId = "Waiting for validation...";
-        tempInput.usedUtxo.push_back(tempUtxo);
-        m_Input.push_back(tempInput);
-
         output tempOutput;
         tempOutput.reciever = userPool[randomWalletID2];
         int randomCoinsQuantity = coinsQuantity(gen);
@@ -179,7 +172,7 @@ public:
             for (wallet::utxo u: i.usedUtxo) {
 
                 cout << u.txId << " : " << u.outputNum << endl;
-                cout << right << setw(26) << i.sender.Name() << setw(50) << "Utxo Value" << endl;
+                cout << right << setw(26) << i.sender.Name() << setw(50) << u.value << endl;
                 cout << endl;
 
             }
@@ -210,7 +203,7 @@ public:
             for (wallet::utxo u: i.usedUtxo) {
 
                 out_r << u.txId << " : " << u.outputNum << endl;
-                out_r << right << setw(26) << i.sender.Name() << setw(50) << "Utxo Value" << endl;
+                out_r << right << setw(26) << i.sender.Name() << setw(50) << u.value << endl;
                 out_r << endl;
 
             }
@@ -235,5 +228,46 @@ public:
     vector<input> Input() const { return m_Input; }
     vector<output> Output() const { return m_Output; }
     transfer Transfer() const { return m_Transfer; }
+
+    void UpdateInOut(vector<wallet> userPool) {
+
+         for (wallet w: userPool) {
+
+            double foundFunds = 0;
+
+            if (w == m_Transfer.from) {
+                
+                for (wallet::utxo u: w.UTXO()) {
+
+                    foundFunds += u.value;
+
+                    input temp;
+                    temp.sender = w;
+                    temp.usedUtxo.push_back(u);
+                    temp.balance = u.value;
+
+                    m_Input.push_back(temp);
+
+                    if (foundFunds >= m_Transfer.funds) break;
+
+                }
+
+                double change = foundFunds - m_Transfer.funds;
+
+                if (change != 0) {
+
+                    output temp;
+                    temp.reciever = w;
+                    temp.amount = change;
+
+                    m_Output.push_back(temp);
+
+                }
+
+            }
+
+        }
+
+    }
 
 };

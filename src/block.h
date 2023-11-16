@@ -25,7 +25,7 @@ public:
     block() : m_PrevHash(""), m_Timestamp(""), m_Version("v0.3"), m_MerkelRootHash(""), 
               m_Nonce(0), m_DifficultyTarget(0), m_Miner(0), hashText(""), m_TxNum(100) {}
 
-    block(vector<block> blockchain, vector<transactionUtxo> txPool, int difficultyTarget, bool blockMined) {
+    block(vector<block> blockchain, vector<transactionUtxo> txPool, int difficultyTarget, bool blockMined, vector<wallet> userPool) {
 
         m_BlockIndex = blockchain.size();
 
@@ -33,7 +33,7 @@ public:
 
         m_PrevHash = blockchain.back().Hash();
 
-        m_TXutxo = validTx(blockchain, txPool);
+        m_TXutxo = validTx(blockchain, txPool, userPool);
 
         m_MerkelRootHash = MerkelRoot();
 
@@ -44,7 +44,7 @@ public:
     }
 
     //for custom tx
-    block(vector<block> blockchain, transactionUtxo tx, int difficultyTarget) {
+    block(vector<block> blockchain, transactionUtxo tx, int difficultyTarget, vector<wallet> userPool) {
 
         m_BlockIndex = blockchain.size();
 
@@ -54,7 +54,7 @@ public:
 
         vector<transactionUtxo> temp;
         temp.push_back(tx);
-        m_TXutxo = validTx(blockchain, temp);
+        m_TXutxo = validTx(blockchain, temp, userPool);
         if (m_TXutxo.empty()) { cout << "Tx is invalid" << endl; }
 
         m_MerkelRootHash = MerkelRoot();
@@ -249,7 +249,7 @@ private:
         
     }
 
-    vector<transactionUtxo> validTx(vector<block> blockchain, vector<transactionUtxo> txPool) {
+    vector<transactionUtxo> validTx(vector<block> blockchain, vector<transactionUtxo> txPool, vector<wallet> userPool) {
 
         vector<transactionUtxo> chosenTx;
 
@@ -285,6 +285,7 @@ private:
             
             if (tempBalance >= tx.Transfer().funds) {
 
+                tx.UpdateInOut(userPool);
                 chosenTx.push_back(tx);
                 m_ChosenTxIndex.push_back(shuffledTx[n]);
                 

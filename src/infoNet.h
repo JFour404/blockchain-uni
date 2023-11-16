@@ -20,6 +20,7 @@ public:
 
                     double sendersBalance = FindUsersBalance(blockchain, w);
 
+                    //graza
                     if (sendersBalance > tx.Transfer().funds){
                         
                         wallet::utxo temp;
@@ -96,6 +97,54 @@ public:
 
     }
     
+    void UpdateWalletsUtxo(vector<block> blockchain, vector<wallet>& userPool) {
+
+        block latestBlock = blockchain.back();
+
+        //pridedam utxo
+        for (transactionUtxo tx: latestBlock.Tx()) {
+
+            for (int i = 0; i < tx.Output().size(); i++) {
+                
+                transactionUtxo::output out = tx.Output()[i];
+
+                for (wallet& w: userPool) {
+
+                    if (w == out.reciever) {
+
+                        wallet::utxo tempUtxo;
+                        tempUtxo.outputNum = i;
+                        tempUtxo.txId = tx.Id();
+                        tempUtxo.value = out.amount;
+
+                        w.UtxoAdd(tempUtxo);
+
+                    }
+
+                }
+
+            }
+
+            for (int i = 0; i < tx.Input().size(); i++) {
+
+                transactionUtxo::input in = tx.Input()[i];
+
+                for (wallet& w: userPool) {
+
+                    if (w == in.sender) {
+
+                        w.UtxoDelete(in.usedUtxo);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
     double FindUsersBalance(vector<block> blockchain, wallet user) {
     
         double balance = 0;

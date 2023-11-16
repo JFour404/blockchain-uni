@@ -48,6 +48,7 @@ public:
         block genesis(m_UserPool);
         m_LiveNet.push_back(genesis);
         genesis.Info();
+        info.UpdateWalletsUtxo(m_LiveNet, m_UserPool);
 
     }
 
@@ -69,6 +70,7 @@ public:
             m_LiveNet.push_back(blockMining(difficultyTarget));
             m_LiveNet.back().Info();
             info.ReplaceUsedTx(m_LiveNet.back().ChosenTxIndex(), m_PaymentPool, m_UserPool);
+            info.UpdateWalletsUtxo(m_LiveNet, m_UserPool);
 
         }
 
@@ -76,7 +78,7 @@ public:
 
     void CreateCustomBlock(transactionUtxo tx, int difficultyTarget) {
 
-        block customBlock(m_LiveNet, tx, difficultyTarget);
+        block customBlock(m_LiveNet, tx, difficultyTarget, m_UserPool);
         m_LiveNet.push_back(customBlock);
         m_LiveNet.back().Info();
 
@@ -91,7 +93,7 @@ public:
         #pragma omp parallel num_threads(numThreads)
         {
             block localBlock;
-            localBlock = block(m_LiveNet, m_PaymentPool, difficultyTarget, blockMined);
+            localBlock = block(m_LiveNet, m_PaymentPool, difficultyTarget, blockMined, m_UserPool);
 
             while (!blockMined) {
                 

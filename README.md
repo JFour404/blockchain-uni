@@ -27,7 +27,7 @@ Baigus generuoti blokus bus galima atsispausdinti pasirinkto bloko ar atskiros t
  - [x] Blokų generavimas
  - [x] Transakcijos informacijos pateikimas
  - [x] Bloko informacijos pateikimas
- - [ ] Vartotojo sąsaja
+ - [x] Vartotojo sąsaja
  - [ ] UTXO modelis
  - [x] Lygiagretūs skaičiavimai
  - [x] Merkel Root Hash

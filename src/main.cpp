@@ -60,7 +60,7 @@ int main (){
                 cout << "Done" << endl;
 
                 cout << "Generuojamos transakcijos..." << endl;
-                app.InitializeTransactions();
+                app.InitializeTransactionsUtxo();
                 cout << "Sugeneruota transakciju: " << app.m_PaymentPool.size() << endl;
 
             }
@@ -143,7 +143,12 @@ int main (){
 
         else if (mainFunction == "wallet") {
 
-            cout << "In development..." << endl << endl;
+            cout << "Pasirinkite pinigines id nuo: 0 iki " << app.m_UserPool.size() - 1 << endl << endl;
+            cout << ">";
+            int walletId = intInput();
+            cout << endl;
+
+            info.WalletInfo(app.m_UserPool[walletId], walletId, app.m_LiveNet);
 
         }
 
@@ -161,7 +166,23 @@ int main (){
 
         else if (mainFunction == "tx") {
 
-            cout << "In development..." << endl << endl;
+            cout << "Iveskite siuntejo pinigines id: " << endl;
+            cout << ">";
+            int senderId = intInput();
+            
+            cout << "Iveskite gavejo pinigines id: " << endl;
+            cout << ">";
+            int recieverId = intInput();
+
+            cout << "Iveskite suma: " << endl;
+            cout << ">";
+            double amount = intInput();
+
+            transactionUtxo customTx(app.m_UserPool[senderId], app.m_UserPool[recieverId], amount);
+
+            app.CreateCustomBlock(customTx, difficultyTarget);
+
+            cout << "Done" << endl << endl;
 
         }
 
@@ -179,8 +200,8 @@ int main (){
             cout << "Generuojamas genesis blokas..." << endl;
             app.CreateGenesisBlock();
             
-            // cout << "Generuojamos transakcijos..." << endl;
-            // app.InitializeTransactionsUtxo();
+            cout << "Generuojamos transakcijos..." << endl;
+            app.InitializeTransactionsUtxo();
 
             
 

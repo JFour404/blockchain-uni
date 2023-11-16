@@ -20,6 +20,14 @@ public:
 
     };
 
+    struct transfer {
+
+        wallet from;
+        wallet to;
+        double funds;
+
+    };
+
 private:
 
     string m_Timestamp;
@@ -27,6 +35,8 @@ private:
     
     vector<input> m_Input;
     vector<output> m_Output;
+
+    transfer m_Transfer;
     
     void Timestamp() {
 
@@ -47,25 +57,31 @@ public:
         
         uniform_int_distribution<> userID(1, userPool.size());
         uniform_int_distribution<> coinsQuantity(10, 100000);
+                
+        int randomWalletID1 = userID(gen) - 1;
+        int randomWalletID2;
+        do { randomWalletID2 = userID(gen) - 1; } while (randomWalletID1 == randomWalletID2);
         
         input tempInput;
-        int randomWalletID1 = userID(gen) - 1;
         tempInput.sender = userPool[randomWalletID1];
         wallet::utxo tempUtxo;
         tempUtxo.txId = "Waiting for validation...";
-        tempInput.usedUtxo.push_back(tempUtxo); 
+        tempInput.usedUtxo.push_back(tempUtxo);
         m_Input.push_back(tempInput);
 
         output tempOutput;
-        int randomWalletID2;
-        do { randomWalletID2 = userID(gen) - 1; } while (randomWalletID1 == randomWalletID2);
         tempOutput.reciever = userPool[randomWalletID2];
-        
         int randomCoinsQuantity = coinsQuantity(gen);
         tempOutput.amount = randomCoinsQuantity;
         m_Output.push_back(tempOutput);
 
-    
+        transfer tempTransfer;
+        tempTransfer.from = userPool[randomWalletID1];
+        tempTransfer.to = userPool[randomWalletID2];
+        tempTransfer.funds = randomCoinsQuantity;
+        m_Transfer = tempTransfer;
+
+
         m_ID = hexHashGen(TransactionServiceInfo());
     
     }
@@ -80,16 +96,48 @@ public:
         uniform_int_distribution coins(100, 1000000);
         double mintedCoins = coins(gen);
 
+        transfer miningReward;
+        miningReward.to = user;
+        miningReward.funds = mintedCoins;
+
         output genesis;
         genesis.reciever = user;
         genesis.amount = mintedCoins;
 
         m_Output.push_back(genesis);
-        
+        m_Transfer = miningReward;
+
         m_ID = hexHashGen(TransactionServiceInfo());
 
     }
 
+    //for manual tx
+    transactionUtxo(wallet o_from, wallet o_to, double o_amount) {
+
+        Timestamp();
+        
+        input tempInput;
+        tempInput.sender = o_from;
+        wallet::utxo tempUtxo;
+        tempUtxo.txId = "Waiting for validation...";
+        tempInput.usedUtxo.push_back(tempUtxo);
+        m_Input.push_back(tempInput);
+
+        output tempOutput;
+        tempOutput.reciever = o_to;
+        tempOutput.amount = o_amount;
+        m_Output.push_back(tempOutput);
+
+        transfer tempTransfer;
+        tempTransfer.from = o_from;
+        tempTransfer.to = o_to;
+        tempTransfer.funds = o_amount;
+        m_Transfer = tempTransfer;
+
+
+        m_ID = hexHashGen(TransactionServiceInfo());
+
+    }
 
     string TransactionServiceInfo() {
 
@@ -186,5 +234,6 @@ public:
     string TimestampInfo() const { return m_Timestamp; }
     vector<input> Input() const { return m_Input; }
     vector<output> Output() const { return m_Output; }
-    
+    transfer Transfer() const { return m_Transfer; }
+
 };

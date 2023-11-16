@@ -25,30 +25,23 @@ public:
 
     }
 
-    void InitializeTransactions() {
+    // void InitializeTransactions() {
         
-        while (m_PaymentPool.size() < m_TxNum) {
+    //     while (m_PaymentPool.size() < m_TxNum) {
             
-            transaction newTx(m_UserPool);
-            wallet sender = newTx.Sender();
+    //         transaction newTx(m_UserPool);
+    //         wallet sender = newTx.Sender();
 
-            if (info.FindUsersBalance(m_LiveNet, sender) >= newTx.Amount() && 
-            hexHashGen(newTx.TransactionServiceInfo()) == newTx.Id() ) {
+    //         if (info.FindUsersBalance(m_LiveNet, sender) >= newTx.Amount() && 
+    //         hexHashGen(newTx.TransactionServiceInfo()) == newTx.Id() ) {
 
-                m_PaymentPool.push_back(newTx);
+    //             m_PaymentPool.push_back(newTx);
 
-            }
+    //         }
             
-        }
+    //     }
 
-    }
-
-    void InitializeTransactionsUtxo() {
-
-        transactionUtxo newTx(m_UserPool);
-        newTx.CmdInfo();
-
-    }
+    // }
 
     void CreateGenesisBlock() {
 
@@ -58,14 +51,34 @@ public:
 
     }
 
+    void InitializeTransactionsUtxo() {
+
+        while (m_PaymentPool.size() < m_TxNum) {
+            
+            transactionUtxo newTx(m_UserPool);
+            m_PaymentPool.push_back(newTx);
+
+        }
+
+    }
+
     void CreateBlocks(int blockChainSize, int difficultyTarget) {
 
         for (int i = 0; i < blockChainSize; i++) {
             
             m_LiveNet.push_back(blockMining(difficultyTarget));
             m_LiveNet.back().Info();
+            info.ReplaceUsedTx(m_LiveNet.back().ChosenTxIndex(), m_PaymentPool, m_UserPool);
 
         }
+
+    }
+
+    void CreateCustomBlock(transactionUtxo tx, int difficultyTarget) {
+
+        block customBlock(m_LiveNet, tx, difficultyTarget);
+        m_LiveNet.push_back(customBlock);
+        m_LiveNet.back().Info();
 
     }
 
@@ -102,7 +115,7 @@ public:
 
     vector<string> m_Names;
     vector<wallet> m_UserPool;
-    vector<transaction> m_PaymentPool;
+    vector<transactionUtxo> m_PaymentPool;
     vector<block> m_LiveNet;
 
     infoNet info;

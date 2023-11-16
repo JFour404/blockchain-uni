@@ -10,11 +10,11 @@ private:
     string m_PrevHash;          // +
     string m_Timestamp;         // +
     string m_Version = "v0.3";  // +
-    string m_MerkelRootHash;    // + TODO: full implementation
+    string m_MerkelRootHash;    
     int m_Nonce = 0;            // +
     int m_DifficultyTarget;     // +
-    vector<transaction> m_TX;   // + TODO: validation
     vector<transactionUtxo> m_TXutxo;
+    vector<int> m_ChosenTxIndex;
     int m_Miner = 0;
     string hashText;
 
@@ -25,7 +25,7 @@ public:
     block() : m_PrevHash(""), m_Timestamp(""), m_Version("v0.3"), m_MerkelRootHash(""), 
               m_Nonce(0), m_DifficultyTarget(0), m_Miner(0), hashText(""), m_TxNum(100) {}
 
-    block(vector<block> blockchain, vector<transaction> txPool, int difficultyTarget, bool blockMined) {
+    block(vector<block> blockchain, vector<transactionUtxo> txPool, int difficultyTarget, bool blockMined) {
 
         m_BlockIndex = blockchain.size();
 
@@ -33,13 +33,37 @@ public:
 
         m_PrevHash = blockchain.back().Hash();
 
-        m_TX = validTx(blockchain, txPool);
+        m_TXutxo = validTx(blockchain, txPool);
 
         m_MerkelRootHash = MerkelRoot();
 
         m_Timestamp = getTimestamp();
         
         hashText = m_PrevHash + m_Timestamp + m_Version + m_MerkelRootHash + to_string(m_DifficultyTarget);
+
+    }
+
+    //for custom tx
+    block(vector<block> blockchain, transactionUtxo tx, int difficultyTarget) {
+
+        m_BlockIndex = blockchain.size();
+
+        m_DifficultyTarget = difficultyTarget;
+
+        m_PrevHash = blockchain.back().Hash();
+
+        vector<transactionUtxo> temp;
+        temp.push_back(tx);
+        m_TXutxo = validTx(blockchain, temp);
+        if (m_TXutxo.empty()) { cout << "Tx is invalid" << endl; }
+
+        m_MerkelRootHash = MerkelRoot();
+
+        m_Timestamp = getTimestamp();
+        
+        hashText = m_PrevHash + m_Timestamp + m_Version + m_MerkelRootHash + to_string(m_DifficultyTarget);
+        
+        m_Hash = blockHashGen();
 
     }
 
@@ -67,7 +91,8 @@ public:
     }
 
     string Hash() const { return m_Hash; }
-    vector<transaction> Tx() const { return m_TX; }
+    vector<transactionUtxo> Tx() const { return m_TXutxo; }
+    vector<int> ChosenTxIndex() const { return m_ChosenTxIndex; }
     int Index() const { return m_BlockIndex; }
     void Miner(int miner) { m_Miner = miner; } 
 
@@ -183,40 +208,50 @@ private:
 
     string MerkelRoot () {
 
-        vector<string> treeLeaves;
+        if (m_TXutxo.empty()) {
 
-        for (int i = 0; i < m_TXutxo.size(); i++) {
-
-            treeLeaves.push_back(m_TXutxo[i].Id());
+            return "";
 
         }
 
-        while (treeLeaves.size() > 1) {
+        else {
+
+            vector<string> treeLeaves;
             
-            if (treeLeaves.size() % 2 != 0) {
+            for (int i = 0; i < m_TXutxo.size(); i++) {
+
+                treeLeaves.push_back(m_TXutxo[i].Id());
+
+            }
+
+            while (treeLeaves.size() > 1) {
                 
-                treeLeaves.push_back(treeLeaves.back());
+                if (treeLeaves.size() % 2 != 0) {
+                    
+                    treeLeaves.push_back(treeLeaves.back());
+
+                }
+
+                vector<string> newHashes;
+                for (int i = 0; i < treeLeaves.size(); i += 2) {
+
+                    newHashes.push_back(hexHashGen(treeLeaves[i] + treeLeaves[i + 1]));
+
+                }
+
+                treeLeaves = newHashes;
 
             }
 
-            vector<string> newHashes;
-            for (int i = 0; i < treeLeaves.size(); i += 2) {
-
-                newHashes.push_back(hexHashGen(treeLeaves[i] + treeLeaves[i + 1]));
-
-            }
-
-            treeLeaves = newHashes;
+            return treeLeaves[0];
 
         }
-
-        return treeLeaves[0];
-
+        
     }
 
-    vector<transaction> validTx(vector<block> blockchain, vector<transaction> txPool) {
+    vector<transactionUtxo> validTx(vector<block> blockchain, vector<transactionUtxo> txPool) {
 
-        vector<transaction> chosenTx;
+        vector<transactionUtxo> chosenTx;
 
         vector<int> shuffledTx = genRandomNumbers (txPool.size() - 1);
 
@@ -226,16 +261,16 @@ private:
         
         while (chosenTx.size() < m_TxNum && n < txPool.size()) {
         
-            transaction tx = txPool[shuffledTx[n]];
+            transactionUtxo tx = txPool[shuffledTx[n]];
             
-            wallet tempSender = tx.Sender();
+            wallet tempSender = tx.Transfer().from;
             double tempBalance = FindUsersBalance(blockchain, tempSender);
             bool newSender = true;
 
             int index;
             for (int i = 0; i < sender.size(); i++) {
 
-                if (sender[i].PublicKey() == tx.SenderPkey()) {
+                if (sender[i].PublicKey() == tx.Transfer().from.PublicKey()) {
                     
                     index = i;
 
@@ -248,19 +283,20 @@ private:
 
             }
             
-            if (tempBalance >= tx.Amount()) {
+            if (tempBalance >= tx.Transfer().funds) {
 
                 chosenTx.push_back(tx);
+                m_ChosenTxIndex.push_back(shuffledTx[n]);
                 
                 if (newSender) {
                     
-                    tempBalance -= tx.Amount();
+                    tempBalance -= tx.Transfer().funds;
                     sender.push_back(tempSender);
                     balance.push_back(tempBalance);
 
                 } else {
                 
-                    balance[index] -= tx.Amount(); 
+                    balance[index] -= tx.Transfer().funds; 
                 
                 }
 
@@ -297,17 +333,17 @@ private:
 
         for (block b: blockchain) {
             
-            for (transaction tx: b.Tx()) {
+            for (transactionUtxo tx: b.Tx()) {
                 
-                if (tx.SenderPkey() == user.PublicKey()) {
+                if (tx.Transfer().from.PublicKey() == user.PublicKey()) {
                     
-                    balance -= tx.Amount();
+                    balance -= tx.Transfer().funds;
 
                 }
                 
-                if (tx.RecieverPkey() == user.PublicKey()) {
+                if (tx.Transfer().to.PublicKey() == user.PublicKey()) {
                     
-                    balance += tx.Amount();
+                    balance += tx.Transfer().funds;
 
                 }
             

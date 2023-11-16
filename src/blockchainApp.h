@@ -25,24 +25,6 @@ public:
 
     }
 
-    // void InitializeTransactions() {
-        
-    //     while (m_PaymentPool.size() < m_TxNum) {
-            
-    //         transaction newTx(m_UserPool);
-    //         wallet sender = newTx.Sender();
-
-    //         if (info.FindUsersBalance(m_LiveNet, sender) >= newTx.Amount() && 
-    //         hexHashGen(newTx.TransactionServiceInfo()) == newTx.Id() ) {
-
-    //             m_PaymentPool.push_back(newTx);
-
-    //         }
-            
-    //     }
-
-    // }
-
     void CreateGenesisBlock() {
 
         block genesis(m_UserPool);

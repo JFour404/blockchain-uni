@@ -28,3 +28,4 @@ clean:
 
 cleanBlocks:
 	del /S /Q ..\blocks\*
+	del /S /Q userPool.txt

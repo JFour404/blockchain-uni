@@ -154,7 +154,8 @@ int main (){
 
         else if (mainFunction == "wallet -l") {
 
-            cout << "In development..." << endl << endl;
+            info.UserPoolInfo(app.m_UserPool, app.m_LiveNet);
+            cout << "Done" << endl << endl;
 
         }
 

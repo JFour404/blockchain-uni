@@ -201,4 +201,30 @@ public:
 
     }
 
+    void UserPoolInfo(vector<wallet> userPool, vector<block> blockchain) {
+
+        ofstream out_r("../blocks/userPool.txt");
+
+        out_r << "PINIGINIU INFORMACIJA" << endl;
+        
+        for (int i = 0; i < userPool.size(); i++) {
+
+            out_r << "-------------------------------" << endl;
+            out_r << "Wallet id: " << i << endl;
+            out_r << "Name: " << userPool[i].Name() << endl;
+            out_r << "PublicKey: " << userPool[i].PublicKey() << endl;
+            out_r << "Balance: " << FindUsersBalance(blockchain, userPool[i]) << endl;
+            out_r << "Utxo: " << endl;
+            
+            for (wallet::utxo u: userPool[i].UTXO()) {
+
+                out_r << u.txId << " : " << u.outputNum << " " << u.value << endl;
+
+            }
+
+            out_r << endl;
+        }
+
+    }
+
 };

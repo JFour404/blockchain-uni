@@ -109,12 +109,12 @@ public:
 
         Timestamp();
         
-        input tempInput;
-        tempInput.sender = o_from;
-        wallet::utxo tempUtxo;
-        tempUtxo.txId = "Waiting for validation...";
-        tempInput.usedUtxo.push_back(tempUtxo);
-        m_Input.push_back(tempInput);
+        // input tempInput;
+        // tempInput.sender = o_from;
+        // wallet::utxo tempUtxo;
+        // tempUtxo.txId = "Waiting for validation...";
+        // tempInput.usedUtxo.push_back(tempUtxo);
+        // m_Input.push_back(tempInput);
 
         output tempOutput;
         tempOutput.reciever = o_to;

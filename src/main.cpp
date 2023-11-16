@@ -3,78 +3,137 @@
 
 int main (){
     
-    string mainFunction = "";
+    string mainFunction = "help";
     bool enableInspection = false;
+    bool blockchainCreated = false;
 
     blockchainApp app;
     infoNet info;
     int blockchainSize = 5;
     int difficultyTarget = 3;
 
-    cout << "Pasirinkite programos funkcija: " << endl;
-    cout << "/0 Paleisti bloku grandine." << endl;
-    cout << "/1 Atspausdinti informacija (cmd)." << endl;
-    cout << "/2 Sandbox" << endl;
-    cout << "/e exit" << endl;
 
-    while ((mainFunction = askCommand(0)) != "/e"){
+    while (mainFunction != "exit"){
 
-        if (mainFunction == "/0") {
+        if (mainFunction == "help") {
 
-            cout << "Ar norite naudoti numatytaji bloku skaiciu ir sudetinguma? (y/n) :  ";
-            
-            if (askCommand(1) == "n") {
+            cout << "== Commands ==" << endl;
+            cout << setw(15) << left << "help" << "Pateikia visas galimas komandas su aprasais" << endl;
+            cout << setw(15) << left << "runChain" << "Generuojama bloku grandine pagal default konfiguracija" << endl;
+            cout << setw(15) << left << " -c" << "Custom konfiguracja" << endl;
+            cout << setw(15) << left << "cleanChain" << "Isvaloma bloku grandine" << endl;
+            cout << setw(15) << left << "printBlock" << "Atspausdina faile block-1.txt pasirinkta bloka" << endl;
+            cout << setw(15) << left << "printTx" << "Atspausdina cmd pasirinkta transakcija " << endl;
+            cout << setw(15) << left << "wallet" << "Atspausdina pasirinktos pinigines informacija" << endl;
+            cout << setw(15) << left << " -l" << "Atspausdina visu piniginiu informacija faile wallets.txt" << endl;
+            cout << setw(15) << left << " -r" << "Atspausdina atsitiktiniu piniginiu informacija cmd" << endl;
+            cout << setw(15) << left << "tx" << "Sukuria nauja transakcija" << endl;
+            cout << setw(15) << left << " -g" << "Sugeneruojama automatiskai" << endl;
+            cout << setw(15) << left << "script" << "Vykdomas skriptas" << endl;
+            cout << setw(15) << left << "exit" << "Nutraukia programos vykdyma" << endl << endl;
+
+        }
+
+        cout << ">";
+        mainFunction = askCommand(0);
+        cout << endl;
+
+        if (mainFunction == "runChain" || mainFunction == "runChain -c") {
+
+            if (mainFunction == "runChain -c") {
 
                 cout << "Iveskite bloku skaiciu: ";
-                cin >> blockchainSize;
+                blockchainSize = intInput();
                 cout << "Iveskite sudetingumo lygi: ";
-                cin >> difficultyTarget;
+                difficultyTarget = intInput();
                 
             }
             
-            cout << "Generuojamos pinigines..." << endl;
-            app.InitializeUsers();
+            if (blockchainCreated == false) {
 
-            cout << "Generuojamas genesis blokas..." << endl;
-            app.CreateGenesisBlock();
+                cout << "Generuojamos pinigines..." << endl;
+                app.InitializeUsers();
+                cout << "Sugeneruota piniginiu: " << app.m_UserPool.size() << endl;
 
-            cout << "Generuojamos transakcijos..." << endl;
-            app.InitializeTransactions();
+                cout << "Generuojamas genesis blokas..." << endl;
+                app.CreateGenesisBlock();
+                cout << "Done" << endl;
 
-            cout << "Generuojami blokai..." << endl;
-            app.CreateBlocks(blockchainSize, difficultyTarget);
-            cout << "Bloku generavimas baigtas!" << endl;
-            cout << "Visus blokus ir ju trasakcijas galite rasti <blocks> aplankale." << endl;
-
-            
-
-
-            enableInspection = true;
-
-        } 
-        
-        else if (mainFunction == "/1" && enableInspection == 1) {
-
-            cout << "Spausdinti bloko (/b) ar transakcijos (/t) informacija? :  ";
-            string printInfo = askCommand(2);
-
-            int chosenBlock;
-            int chosenTransaction;
-            
-            cout << "Pasirinkite bloka nuo 0 iki " << app.m_LiveNet.size() - 1 << ":";
-            cin >> chosenBlock;
-
-            if (printInfo == "/b") {
-
-                app.m_LiveNet[chosenBlock].Info(-1);
-                cout << "Informacija apie bloka pateikta <block-1.txt> faile" << endl;
+                cout << "Generuojamos transakcijos..." << endl;
+                app.InitializeTransactionsUtxo();
+                cout << "Sugeneruota transakciju: " << app.m_PaymentPool.size() << endl;
 
             }
             
-            if (printInfo == "/t") {
+            cout << "Generuojami blokai..." << endl;
+            cout << "Sudetingumas: " << difficultyTarget << endl;
+            cout << "Bloku kiekis: " << blockchainSize << endl;
+            app.CreateBlocks(blockchainSize, difficultyTarget);
+            cout << "Bloku generavimas baigtas!" << endl;
+            cout << "Visus blokus ir ju trasakcijas galite rasti <blocks> aplankale." << endl << endl;
+
+            enableInspection = true;
+            blockchainCreated = true;
+
+        } 
+        
+        else if (mainFunction == "cleanChain") {
+            
+            cout << "Istrinama bloku grandine..." << endl;
+            app.m_LiveNet.clear();
+            app.m_LiveNet.shrink_to_fit();
+            cout << "Done" << endl;
+            
+            cout << "Istrinamos pinigines..." << endl;
+            app.m_UserPool.clear();
+            app.m_UserPool.shrink_to_fit();
+            cout << "Done" << endl;
+            
+            cout << "Istrinamos transakcijos..." << endl;
+            app.m_PaymentPool.clear();
+            app.m_PaymentPool.shrink_to_fit();
+            cout << "Done" << endl << endl;
+
+            enableInspection = false;
+            blockchainCreated = false;
+
+        }
+
+        else if (mainFunction == "printBlock") {
+
+            if (enableInspection == false) {
+
+                cout << "Bloku grandine nerasta, noredami sukurti nauja grandine naudokite komanda runChain" << endl << endl;
+
+            }
+
+            else {
+                
+                cout << "Pasirinkite bloka nuo 0 iki " << app.m_LiveNet.size() - 1 << ": ";
+                int chosenBlock = intInput();
+
+                app.m_LiveNet[chosenBlock].Info("block-1.txt");
+                cout << "Informacija apie bloka pateikta <block-1.txt> faile" << endl << endl;
+
+            }
+
+        }
+
+        else if (mainFunction == "printTx") {
+
+            if (enableInspection == false) {
+
+                cout << "Bloku grandine nerasta, noredami sukurti nauja grandine naudokite komanda runChain" << endl << endl;
+
+            }
+
+            else {
+
+                cout << "Pasirinkite bloka nuo 0 iki " << app.m_LiveNet.size() - 1 << ": ";
+                int chosenBlock = intInput();
 
                 cout << "Pasirinkite transajcija nuo 0 iki " << app.m_LiveNet[chosenBlock].Tx().size() - 1 << ":";
-                cin >> chosenTransaction;
+                int chosenTransaction = intInput();
 
                 app.m_LiveNet[chosenBlock].Tx()[chosenTransaction].CmdInfo();
 
@@ -82,24 +141,81 @@ int main (){
 
         }
 
-        else if (mainFunction == "/2") {
+        else if (mainFunction == "wallet") {
+
+            cout << "Pasirinkite pinigines id nuo: 0 iki " << app.m_UserPool.size() - 1 << endl << endl;
+            cout << ">";
+            int walletId = intInput();
+            cout << endl;
+
+            info.WalletInfo(app.m_UserPool[walletId], walletId, app.m_LiveNet);
+
+        }
+
+        else if (mainFunction == "wallet -l") {
+
+            cout << "In development..." << endl << endl;
+
+        }
+
+        else if (mainFunction == "wallet -r") {
+
+            cout << "In development..." << endl << endl;
+
+        }
+
+        else if (mainFunction == "tx") {
+
+            cout << "Iveskite siuntejo pinigines id: " << endl;
+            cout << ">";
+            int senderId = intInput();
+            
+            cout << "Iveskite gavejo pinigines id: " << endl;
+            cout << ">";
+            int recieverId = intInput();
+
+            cout << "Iveskite suma: " << endl;
+            cout << ">";
+            double amount = intInput();
+
+            transactionUtxo customTx(app.m_UserPool[senderId], app.m_UserPool[recieverId], amount);
+
+            app.CreateCustomBlock(customTx, difficultyTarget);
+
+            cout << "Done" << endl << endl;
+
+        }
+
+        else if (mainFunction == "tx -g") {
+
+            cout << "In development..." << endl << endl;
+
+        }
+
+        else if (mainFunction == "script") {
 
             cout << "Generuojamos pinigines..." << endl;
             app.InitializeUsers();
 
-            cout << "Generuojamos transakcijos..." << endl;
-            app.InitializeTransactions();
-
             cout << "Generuojamas genesis blokas..." << endl;
             app.CreateGenesisBlock();
+            
+            cout << "Generuojamos transakcijos..." << endl;
+            app.InitializeTransactionsUtxo();
 
-            cout << "Atnaujinama piniginiu info..." << endl;
-            info.UpadateWallets(app.m_LiveNet, app.m_UserPool);
+            
 
-            double mintedSuply = 0;
-            for (wallet w: app.m_UserPool) {
-                mintedSuply += info.FindUsersBalance(app.m_LiveNet, w);
-            }
+            
+            // cout << "Generuojamos transakcijos..." << endl;
+            // app.InitializeTransactions();
+
+            // cout << "Atnaujinama piniginiu info..." << endl;
+            // info.UpadateWallets(app.m_LiveNet, app.m_UserPool);
+
+            // double mintedSuply = 0;
+            // for (wallet w: app.m_UserPool) {
+            //     mintedSuply += info.FindUsersBalance(app.m_LiveNet, w);
+            // }
 
             
             // cout << "Pirmosios pinigines info: " << endl;
@@ -115,18 +231,18 @@ int main (){
 
 
 
-            cout << "Sukurta monetu: " << mintedSuply << endl;
+            // cout << "Sukurta monetu: " << mintedSuply << endl;
 
-            cout << "Generuojami blokai..." << endl;
-            app.CreateBlocks(blockchainSize, difficultyTarget);
-            cout << "Bloku generavimas baigtas!" << endl;
+            // cout << "Generuojami blokai..." << endl;
+            // app.CreateBlocks(blockchainSize, difficultyTarget);
+            // cout << "Bloku generavimas baigtas!" << endl;
 
-            double circulatingSuply = 0;
-            for (wallet w: app.m_UserPool) {
-                circulatingSuply += info.FindUsersBalance(app.m_LiveNet, w);
-            }
+            // double circulatingSuply = 0;
+            // for (wallet w: app.m_UserPool) {
+            //     circulatingSuply += info.FindUsersBalance(app.m_LiveNet, w);
+            // }
 
-            cout << "Apyvartoje esancios monetos: " << circulatingSuply << endl;
+            // cout << "Apyvartoje esancios monetos: " << circulatingSuply << endl;
 
 
 

@@ -26,12 +26,20 @@ string askCommand (int select) {
     
     string input;
     if (select==0){
+        set<string> commands = {"help", "genesis", "runChain", "runChain -c", "cleanChain", 
+        "printBlock", "printTx", "wallet", "wallet -l", "wallet -r", "tx", "tx -g", "script", "exit"};
         while(1){
-        if (!(cin >> input)||(input!="/0"&&input!="/1"&&input!="/2"&&input!="/e")){
-            cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
-            cin.clear(); 
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
-            } else break;
+            if (!getline(cin, input)) {
+                cout << "Neteisinga ivestis. Prasome ivesti is naujo" << endl << endl;
+                cout << ">";
+                cin.clear(); 
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+            } else if (commands.find(input) == commands.end()) {
+                cout << "Neteisinga ivestis. Prasome ivesti is naujo" << endl << endl;
+                cout << ">";
+            } else {
+                break;
+            }
         } 
     }
     if (select==1){
@@ -64,6 +72,20 @@ string askCommand (int select) {
         } 
     }
     return input;
+}
+
+int intInput () {
+    string input;
+    while (1) {
+        if (!(cin >> input) || count_if(input.begin(), input.end(), [](char c){ return !isdigit(c); }) > 0 || input.find_first_of(",.") != string::npos) {
+            cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
+            cin.clear(); 
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } else {
+            break;
+        }
+    }
+    return stoi(input);
 }
 
 string getTimestamp() {

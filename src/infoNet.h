@@ -9,10 +9,10 @@ public:
 
         block latestBlock = blockchain.back();
 
-        for (transaction tx: latestBlock.Tx()){
+        for (transactionUtxo tx: latestBlock.Tx()){
 
-            string sendersPkey = tx.SenderPkey();
-            string recieversPkey = tx.RecieverPkey();
+            string sendersPkey = tx.Transfer().from.PublicKey();
+            string recieversPkey = tx.Transfer().to.PublicKey();
 
             for (wallet& w : userPool) {
                 
@@ -20,9 +20,12 @@ public:
 
                     double sendersBalance = FindUsersBalance(blockchain, w);
 
-                    if (sendersBalance > tx.Amount()){
+                    //graza
+                    if (sendersBalance > tx.Transfer().funds){
                         
-                        w.UtxoAdd(tx.Id());
+                        wallet::utxo temp;
+                        temp.txId = tx.Id();
+                        w.UtxoAdd(temp);
 
                     }    
 
@@ -34,17 +37,19 @@ public:
 
                         if ( goalReached ) break;
 
-                        for (transaction tX: b.Tx()) {
+                        for (transactionUtxo tX: b.Tx()) {
 
                             for (int i = 0; i < w.UTXO().size(); i++) {
 
-                                if (tX.Id() == w.UTXO()[i]) {
+                                if (tX.Id() == w.UTXO()[i].txId) {
 
-                                    if (w.PublicKey() == tX.RecieverPkey()) { 
+                                    if (w.PublicKey() == tX.Transfer().from.PublicKey()) { 
                                         
-                                        foundFunds += tX.Amount();
-                                        w.UtxoDelete(tX.Id()); 
-
+                                        foundFunds += tX.Transfer().funds;
+                                        wallet::utxo temp;
+                                        temp.txId = tx.Id();
+                                        w.UtxoDelete(temp);
+                                        
                                         break;
                                     }
 
@@ -59,7 +64,7 @@ public:
 
                             }
 
-                            if (foundFunds >= tx.Amount()) { goalReached = true; }
+                            if (foundFunds >= tx.Transfer().funds) { goalReached = true; }
                             if ( goalReached ) break;
 
 
@@ -80,7 +85,9 @@ public:
 
                 if (w.PublicKey() == recieversPkey) {
 
-                    w.UtxoAdd(tx.Id());
+                    wallet::utxo temp;
+                    temp.txId = tx.Id();
+                    w.UtxoAdd(temp);
 
                 }
             
@@ -90,23 +97,71 @@ public:
 
     }
     
+    void UpdateWalletsUtxo(vector<block> blockchain, vector<wallet>& userPool) {
+
+        block latestBlock = blockchain.back();
+
+        //pridedam utxo
+        for (transactionUtxo tx: latestBlock.Tx()) {
+
+            for (int i = 0; i < tx.Output().size(); i++) {
+                
+                transactionUtxo::output out = tx.Output()[i];
+
+                for (wallet& w: userPool) {
+
+                    if (w == out.reciever) {
+
+                        wallet::utxo tempUtxo;
+                        tempUtxo.outputNum = i;
+                        tempUtxo.txId = tx.Id();
+                        tempUtxo.value = out.amount;
+
+                        w.UtxoAdd(tempUtxo);
+
+                    }
+
+                }
+
+            }
+
+            for (int i = 0; i < tx.Input().size(); i++) {
+
+                transactionUtxo::input in = tx.Input()[i];
+
+                for (wallet& w: userPool) {
+
+                    if (w == in.sender) {
+
+                        w.UtxoDelete(in.usedUtxo);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
     double FindUsersBalance(vector<block> blockchain, wallet user) {
     
         double balance = 0;
 
         for (block b: blockchain) {
             
-            for (transaction tx: b.Tx()) {
+            for (transactionUtxo tx: b.Tx()) {
                 
-                if (tx.SenderPkey() == user.PublicKey()) {
+                if (tx.Transfer().from.PublicKey() == user.PublicKey()) {
                     
-                    balance -= tx.Amount();
+                    balance -= tx.Transfer().funds;
 
                 }
                 
-                if (tx.RecieverPkey() == user.PublicKey()) {
+                if (tx.Transfer().to.PublicKey() == user.PublicKey()) {
                     
-                    balance += tx.Amount();
+                    balance += tx.Transfer().funds;
 
                 }
             
@@ -117,6 +172,33 @@ public:
         return balance;
     }
 
+    void ReplaceUsedTx(vector<int> usedTx, vector<transactionUtxo>& paymentPool, vector<wallet> userPool) {
 
+        for (int i: usedTx) {
+
+            transactionUtxo newTx(userPool);
+            paymentPool[i] = newTx;
+
+        }
+
+    }
+
+    void WalletInfo(wallet user, int index, vector<block> blockchain) {
+
+        cout << "----==Wallet #" << index << "==----" << endl;
+        cout << "Name: " << user.Name() << endl;
+        cout << "PublicKey: " << user.PublicKey() << endl;
+        cout << "Balance: " << FindUsersBalance(blockchain, user) << endl;
+        cout << "Utxo: " << endl;
+        
+        for (wallet::utxo u: user.UTXO()) {
+
+            cout << u.txId << " : " << u.outputNum << " " << u.value << endl;
+
+        }
+
+        cout << endl;
+
+    }
 
 };

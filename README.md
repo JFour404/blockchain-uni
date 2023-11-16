@@ -2,7 +2,7 @@
 
 Blokų grandinių technologijų **2 - oji** užduotis.
 
-## v0.2
+## v0.3
 
 Ši programa sukuria supaprastintą blokų grandinę ir gali atspausdinti norimą bloką ar transakciją.
 
@@ -20,20 +20,20 @@ Baigus generuoti blokus bus galima atsispausdinti pasirinkto bloko ar atskiros t
 
 ## Development road map
 
-Šioje versijoje pridėta: Merkle Root Hash, balanso tikrinimas, transakcjos hash'o tikrinimas, lygiagretus bloko "kasimas". 
+Šioje versijoje pridėta: sutvarkyta UI, įgyvendintas UTXO modelis, transakcijų šalinimas, regeneracija, vartotojo įvedamos transakcijos. 
 
  - [x] Piniginių generavimas
  - [x] Transakcijų generavimas
  - [x] Blokų generavimas
  - [x] Transakcijos informacijos pateikimas
  - [x] Bloko informacijos pateikimas
- - [ ] Vartotojo sąsaja
- - [ ] UTXO modelis
+ - [x] Vartotojo sąsaja
+ - [x] UTXO modelis
  - [x] Lygiagretūs skaičiavimai
  - [x] Merkel Root Hash
  - [x] Balanso apskaičiavimas
  - [x] Trasakcijos validumo patikra
- - [ ] Transakcijų šalinimas, regeneracija
- - [ ] Vartotojo įvedamos transakcijos
+ - [x] Transakcijų šalinimas, regeneracija
+ - [x] Vartotojo įvedamos transakcijos
  - [ ] Detalesnė transakcijų informacija
        

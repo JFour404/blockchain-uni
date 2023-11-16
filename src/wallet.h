@@ -3,18 +3,33 @@
 
 class wallet {
 
+public:
+
+    struct utxo
+    {
+        string txId;
+        int outputNum;
+        double value = 0;
+
+        bool operator==(const utxo& other) const {
+            
+            return txId == other.txId && outputNum == other.outputNum;
+        
+        }
+    };
+
 private:
     
     std::string m_Name;
     std::string m_PublicKey;
-    std::vector<string> m_UTXOref;
+    std::vector<utxo> m_UTXO;
 
 public:
 
     wallet() {
         m_Name = "";
         m_PublicKey = "";
-        m_UTXOref.clear();
+        m_UTXO.clear();
     }
 
     wallet(std::vector<std::string> names, int id){
@@ -37,41 +52,41 @@ public:
         std::string text = m_Name + index;
         m_PublicKey = hexHashGen(text);
 
-        m_UTXOref.clear();
+        m_UTXO.clear();
 
     }
 
     std::string Name() const { return m_Name; }
     std::string PublicKey() const { return m_PublicKey; }
-    std::vector<string> UTXO() const { return m_UTXOref; }
+    std::vector<utxo> UTXO() const { return m_UTXO; }
 
-    void UtxoAdd (vector<string> addedUtxo) {
+    void UtxoAdd (vector<utxo> addedUtxo) {
 
-        for (string utxo: addedUtxo) {
+        for (utxo u: addedUtxo) {
 
-            m_UTXOref.push_back(utxo);
+            m_UTXO.push_back(u);
 
         }
         
     }
 
-    void UtxoAdd (string addedUtxo) {
+    void UtxoAdd (utxo addedUtxo) {
 
-        m_UTXOref.push_back(addedUtxo);
-
-    }
-
-    void UtxoDelete (vector<string> deletedUtxo) {
-
-        m_UTXOref.erase(remove_if(m_UTXOref.begin(), m_UTXOref.end(), [&](const string& m_UTXOref) {
-        return find(deletedUtxo.begin(), deletedUtxo.end(), m_UTXOref) != deletedUtxo.end();
-        }), m_UTXOref.end());
+        m_UTXO.push_back(addedUtxo);
 
     }
 
-    void UtxoDelete (string deletedUtxo) {
+    void UtxoDelete (vector<utxo> deletedUtxo) {
 
-        m_UTXOref.erase(std::remove(m_UTXOref.begin(), m_UTXOref.end(), deletedUtxo), m_UTXOref.end());
+        m_UTXO.erase(remove_if(m_UTXO.begin(), m_UTXO.end(), [&](const utxo& m_UTXO) {
+        return find(deletedUtxo.begin(), deletedUtxo.end(), m_UTXO) != deletedUtxo.end();
+        }), m_UTXO.end());
+
+    }
+
+    void UtxoDelete (utxo deletedUtxo) {
+
+        m_UTXO.erase(std::remove(m_UTXO.begin(), m_UTXO.end(), deletedUtxo), m_UTXO.end());
 
     }
 
@@ -80,4 +95,5 @@ public:
         return this->m_PublicKey == other.m_PublicKey;
     
     }
+
 };

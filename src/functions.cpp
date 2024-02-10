@@ -30,47 +30,54 @@ string askCommand (int select) {
         "printBlock", "printTx", "wallet", "wallet -l", "wallet -r", "tx", "tx -g", "script", "exit"};
         while(1){
             if (!getline(cin, input)) {
-                cout << "Neteisinga ivestis. Prasome ivesti is naujo" << endl << endl;
+                if (!input.empty())
+                    cout << "Neteisinga ivestis. Prasome ivesti is naujo" << endl << endl;
                 cout << ">";
                 cin.clear(); 
                 cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
             } else if (commands.find(input) == commands.end()) {
-                cout << "Neteisinga ivestis. Prasome ivesti is naujo" << endl << endl;
+                if (!input.empty())
+                    cout << "Neteisinga ivestis. Prasome ivesti is naujo" << endl << endl;
                 cout << ">";
             } else {
                 break;
             }
         } 
     }
+
     if (select==1){
         while(1){
         if (!(cin >> input)||(input!="y"&&input!="n")){
-            cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
-            cin.clear(); 
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
-            } else break;
-        } 
-    }
-    if (select==2){
-        while(1){
-        if (!(cin >> input)||(input!="/b"&&input!="/t")){
-            cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
+            if (!input.empty())
+                cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
             cin.clear(); 
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
             } else break;
         } 
     }
 
+    if (select==2){
+        while(1){
+        if (!(cin >> input)||(input!="/b"&&input!="/t")){
+            if (!input.empty())
+                cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
+            cin.clear(); 
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+            } else break;
+        } 
+    }
 
     if (select==3){
         while(1){
         if (!(cin >> input)||(input!="/0"&&input!="/1"&&input!="/2"&&input!="/3"&&input!="/4"&&input!="/5"&&input!="/e")){
-            cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
+            if (!input.empty())
+                cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
             cin.clear(); 
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
             } else break;
         } 
     }
+    
     return input;
 }
 
@@ -78,7 +85,8 @@ int intInput () {
     string input;
     while (1) {
         if (!(cin >> input) || count_if(input.begin(), input.end(), [](char c){ return !isdigit(c); }) > 0 || input.find_first_of(",.") != string::npos) {
-            cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
+            if (!input.empty())
+                cout << "Neteisinga ivestis. Prasome ivesti is naujo" << std::endl;
             cin.clear(); 
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         } else {

@@ -1,12 +1,10 @@
 #include "header.h"
 #pragma once
 
-
-
 class blockchainApp {
 
-    int m_TxNum = 10000;     //10000 naudojama txPool
-    int m_UsersNum = 1000;    //1000
+    int m_TxNum = 10000;     
+    int m_UsersNum = 1000;   
 
 public:
     
@@ -24,24 +22,6 @@ public:
         }
 
     }
-
-    // void InitializeTransactions() {
-        
-    //     while (m_PaymentPool.size() < m_TxNum) {
-            
-    //         transaction newTx(m_UserPool);
-    //         wallet sender = newTx.Sender();
-
-    //         if (info.FindUsersBalance(m_LiveNet, sender) >= newTx.Amount() && 
-    //         hexHashGen(newTx.TransactionServiceInfo()) == newTx.Id() ) {
-
-    //             m_PaymentPool.push_back(newTx);
-
-    //         }
-            
-    //     }
-
-    // }
 
     void CreateGenesisBlock() {
 

@@ -53,13 +53,6 @@ public:
                                         break;
                                     }
 
-                                    // if (w.PublicKey() == tX.SenderPkey()) {
-
-                                        
-
-                                    //     break;
-                                    // }
-
                                 }
 
                             }
@@ -67,19 +60,9 @@ public:
                             if (foundFunds >= tx.Transfer().funds) { goalReached = true; }
                             if ( goalReached ) break;
 
-
                         }
 
-
                     }
-
-                    
-
-                    
-
-
-
-
 
                 }
 

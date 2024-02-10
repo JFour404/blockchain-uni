@@ -132,7 +132,7 @@ int main (){
                 cout << "Pasirinkite bloka nuo 0 iki " << app.m_LiveNet.size() - 1 << ": ";
                 int chosenBlock = intInput();
 
-                cout << "Pasirinkite transajcija nuo 0 iki " << app.m_LiveNet[chosenBlock].Tx().size() - 1 << ":";
+                cout << "Pasirinkite transakcija nuo 0 iki " << app.m_LiveNet[chosenBlock].Tx().size() - 1 << ":";
                 int chosenTransaction = intInput();
 
                 app.m_LiveNet[chosenBlock].Tx()[chosenTransaction].CmdInfo();
@@ -142,13 +142,18 @@ int main (){
         }
 
         else if (mainFunction == "wallet") {
+            
+            if (enableInspection) {
 
-            cout << "Pasirinkite pinigines id nuo: 0 iki " << app.m_UserPool.size() - 1 << endl << endl;
-            cout << ">";
-            int walletId = intInput();
-            cout << endl;
+                cout << "Pasirinkite pinigines id nuo: 0 iki " << app.m_UserPool.size() - 1 << endl << endl;
+                int walletId = intInput();
+                cout << endl;
 
-            info.WalletInfo(app.m_UserPool[walletId], walletId, app.m_LiveNet);
+                info.WalletInfo(app.m_UserPool[walletId], walletId, app.m_LiveNet);    
+                
+            } else
+
+                cout << "Pirmiausiai ivykdikite komanda <runChain>" << endl;
 
         }
 
@@ -203,9 +208,6 @@ int main (){
             cout << "Generuojamos transakcijos..." << endl;
             app.InitializeTransactionsUtxo();
 
-            
-
-            
             // cout << "Generuojamos transakcijos..." << endl;
             // app.InitializeTransactions();
 
@@ -243,10 +245,6 @@ int main (){
             // }
 
             // cout << "Apyvartoje esancios monetos: " << circulatingSuply << endl;
-
-
-
-
 
         }
 

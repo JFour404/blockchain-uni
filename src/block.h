@@ -6,19 +6,19 @@ class block {
 private:
 
     int m_BlockIndex;
-    string m_Hash = "";         // +
-    string m_PrevHash;          // +
-    string m_Timestamp;         // +
-    string m_Version = "v0.3";  // +
+    string m_Hash = "";         
+    string m_PrevHash;          
+    string m_Timestamp;         
+    string m_Version = "v0.3";  
     string m_MerkelRootHash;    
-    int m_Nonce = 0;            // +
-    int m_DifficultyTarget;     // +
+    int m_Nonce = 0;            
+    int m_DifficultyTarget;     
     vector<transactionUtxo> m_TXutxo;
     vector<int> m_ChosenTxIndex;
     int m_Miner = 0;
     string hashText;
 
-    int m_TxNum = 100;   //100 atrenkama 1 blokui
+    int m_TxNum = 100; 
 
 public:
 

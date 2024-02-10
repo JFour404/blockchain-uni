@@ -9,7 +9,7 @@ public:
 
         wallet sender;
         vector <wallet::utxo> usedUtxo;
-        double balance; //TODO: automaticly calculate 
+        double balance;
 
     };
 
